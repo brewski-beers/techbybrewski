@@ -19,7 +19,7 @@ export default function AdminTestimonialsPage() {
       {loading ? <div className={styles.list}>{[1,2].map(n => <div key={n} className={`skeleton ${styles.skeleton}`} />)}</div>
       : items.length === 0 ? <AdminCard><p className="text-body text-muted">No testimonials yet. <Link href="/admin/testimonials/new" className="text-accent">Add one →</Link></p></AdminCard>
       : <div className={styles.list}>{items.map(t => (
-          <Link key={t.id} href={`/admin/testimonials/${t.id}`} className={styles.item}>
+          <Link key={t.id} href={`/admin/testimonials/edit?id=${t.id}`} className={styles.item}>
             <div className={styles.itemMain}>
               <span className="text-body font-semibold">{t.name}</span>
               <span className="text-body-sm text-muted">{t.title} · {t.company}</span>

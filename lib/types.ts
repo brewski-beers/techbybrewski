@@ -1,4 +1,9 @@
-import { Timestamp } from "firebase/firestore";
+// Compatible with firebase/firestore Timestamp — no SDK import needed
+export interface FirestoreTimestamp {
+  seconds: number;
+  nanoseconds: number;
+  toDate(): Date;
+}
 
 // ── Site Settings ─────────────────────────────────────────────
 export interface SiteSettings {
@@ -54,8 +59,8 @@ export interface CaseStudy {
   images: CaseStudyImage[];
   featured: boolean;
   order: number;
-  publishedAt: Timestamp | null;
-  updatedAt: Timestamp | null;
+  publishedAt: FirestoreTimestamp | null;
+  updatedAt: FirestoreTimestamp | null;
   isPublished: boolean;
 }
 
@@ -95,11 +100,11 @@ export interface ActivityLogEntry {
   collection: string;
   docId: string;
   actorEmail: string;
-  timestamp: Timestamp;
+  timestamp: FirestoreTimestamp;
   changesSummary: string;
 }
 
-// ── Form types (Omit id + Timestamps for create/update forms) ─
+// ── Form types (Omit id + FirestoreTimestamps for create/update forms) ─
 export type ServiceFormData = Omit<Service, "id">;
 export type CaseStudyFormData = Omit<CaseStudy, "id" | "publishedAt" | "updatedAt">;
 export type TestimonialFormData = Omit<Testimonial, "id">;

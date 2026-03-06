@@ -1,3 +1,4 @@
+"use client";
 export { default as AdminButton }     from "./AdminButton";
 export { default as AdminInput }      from "./AdminInput";
 export { default as AdminTextarea }   from "./AdminTextarea";

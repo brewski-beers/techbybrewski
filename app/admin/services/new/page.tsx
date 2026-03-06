@@ -1,5 +1,5 @@
 import ServiceForm from "@/components/admin/ServiceForm/ServiceForm";
-import styles from "../[id]/page.module.css";
+import styles from "../edit/page.module.css";
 
 export default function NewServicePage() {
   return (

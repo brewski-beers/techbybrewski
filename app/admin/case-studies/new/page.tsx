@@ -1,5 +1,5 @@
 import CaseStudyForm from "@/components/admin/CaseStudyForm/CaseStudyForm";
-import styles from "../[id]/page.module.css";
+import styles from "../edit/page.module.css";
 
 export default function NewCaseStudyPage() {
   return (

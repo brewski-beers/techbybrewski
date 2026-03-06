@@ -1,15 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import { use } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { getTestimonialById } from "@/lib/firestore/queries";
 import { updateTestimonial, deleteTestimonial } from "@/lib/firestore/mutations";
 import { Testimonial, TestimonialFormData } from "@/lib/types";
 import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminCard } from "@/components/admin/ui";
 import styles from "@/styles/adminForm.module.css";
 
-export default function EditTestimonialPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function EditTestimonialClient() {
+  const id = useSearchParams().get("id") ?? "";
   const router = useRouter();
   const [item, setItem] = useState<Testimonial | null>(null);
   const [form, setForm] = useState<TestimonialFormData | null>(null);

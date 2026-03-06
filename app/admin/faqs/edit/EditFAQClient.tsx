@@ -1,15 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
-import { use } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { getFAQById } from "@/lib/firestore/queries";
 import { updateFAQ, deleteFAQ } from "@/lib/firestore/mutations";
 import { FAQ, FAQFormData } from "@/lib/types";
 import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminCard } from "@/components/admin/ui";
 import styles from "@/styles/adminForm.module.css";
 
-export default function EditFAQPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function EditFAQClient() {
+  const id = useSearchParams().get("id") ?? "";
   const router = useRouter();
   const [item, setItem] = useState<FAQ | null>(null);
   const [form, setForm] = useState<FAQFormData | null>(null);
