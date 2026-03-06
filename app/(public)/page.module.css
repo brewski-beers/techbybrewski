@@ -1,0 +1,198 @@
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  padding-top: var(--space-20);
+  padding-bottom: var(--space-20);
+}
+
+@media (min-width: 768px) {
+  .hero { padding-top: var(--space-32); padding-bottom: var(--space-32); }
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: var(--container-md);
+}
+
+.eyebrow { margin-bottom: var(--space-2); }
+
+.headline {
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text);
+}
+
+.sub { max-width: 600px; }
+
+.heroCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-8);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-semibold);
+  border-radius: var(--radius-full);
+  font-size: var(--text-base);
+  transition: background var(--transition-fast);
+  min-height: 48px;
+}
+.ctaPrimary:hover { background: var(--color-accent-hover); }
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  font-weight: var(--font-medium);
+  font-size: var(--text-base);
+  transition: color var(--transition-fast);
+  min-height: 48px;
+}
+.ctaSecondary:hover { color: var(--color-text); }
+
+/* ── Sections ─────────────────────────────────────────────── */
+.section { background: var(--color-bg); }
+.sectionAlt { background: var(--color-surface); }
+.sectionTitle { margin-top: var(--space-3); margin-bottom: var(--space-10); }
+
+/* ── Services ─────────────────────────────────────────────── */
+.serviceGrid { margin-top: var(--space-8); }
+
+.serviceCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.sectionAlt .serviceCard { background: var(--color-surface); }
+
+.serviceCard:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.serviceSum { flex: 1; }
+.learn { margin-top: auto; }
+
+/* ── Case Studies ─────────────────────────────────────────── */
+.caseGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .caseGrid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .caseGrid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.caseCard {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+.caseCard:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+.caseImg { width: 100%; height: 200px; object-fit: cover; }
+
+.caseBody { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); flex: 1; }
+
+.caseOverview {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.stack { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+.tag {
+  padding: 2px var(--space-2);
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-full);
+}
+
+.viewAll { margin-top: var(--space-10); text-align: center; }
+
+/* ── Testimonials ─────────────────────────────────────────── */
+.testiGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) { .testiGrid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .testiGrid { grid-template-columns: repeat(3, 1fr); } }
+
+.testimonial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+.quote { font-style: italic; color: var(--color-text); }
+
+.testiFooter { display: flex; align-items: center; gap: var(--space-3); }
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* ── CTA Banner ───────────────────────────────────────────── */
+.ctaBanner {
+  background: var(--color-primary);
+  padding-top: var(--space-20);
+  padding-bottom: var(--space-20);
+}
+
+.ctaBannerInner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .ctaBannerInner { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+
+.ctaTitle { max-width: 500px; }
+
+.ctaBannerBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-8);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-semibold);
+  border-radius: var(--radius-full);
+  font-size: var(--text-base);
+  white-space: nowrap;
+  transition: background var(--transition-fast);
+  min-height: 48px;
+}
+.ctaBannerBtn:hover { background: var(--color-accent-hover); }

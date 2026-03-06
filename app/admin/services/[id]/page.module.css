@@ -1,0 +1,2 @@
+.page { display: flex; flex-direction: column; gap: var(--space-6); }
+.formSkeleton { height: 400px; border-radius: var(--radius-lg); }

@@ -1,0 +1,13 @@
+.form { display: flex; flex-direction: column; gap: var(--space-6); }
+.cardTitle { margin-bottom: var(--space-5); }
+.actions { display: flex; gap: var(--space-3); justify-content: flex-end; flex-wrap: wrap; }
+
+.imageGrid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); margin-bottom: var(--space-4); }
+@media (min-width: 640px) { .imageGrid { grid-template-columns: repeat(2, 1fr); } }
+
+.imageItem { display: flex; flex-direction: column; gap: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3); }
+.thumbnail { width: 100%; height: 120px; object-fit: cover; border-radius: var(--radius-sm); }
+.altInput { padding: var(--space-2); font-size: var(--text-xs); border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.removeImage { font-size: var(--text-xs); color: var(--color-danger); cursor: pointer; text-align: left; }
+
+.fileInput { display: none; }

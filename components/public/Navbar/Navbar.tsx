@@ -1,0 +1,51 @@
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import styles from "./Navbar.module.css";
+
+const NAV_LINKS = [
+  { label: "Services", href: "/services" },
+  { label: "Work", href: "/case-studies" },
+  { label: "Contact", href: "/contact" },
+];
+
+export default function Navbar() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <header className={styles.header}>
+      <nav className={`container ${styles.nav}`}>
+        <Link href="/" className={styles.logo} onClick={() => setOpen(false)}>
+          TechByBrewski
+        </Link>
+
+        {/* Desktop links */}
+        <div className={styles.desktopLinks}>
+          {NAV_LINKS.map(l => (
+            <Link key={l.href} href={l.href} className={`${styles.link} ${pathname.startsWith(l.href) ? styles.linkActive : ""}`}>{l.label}</Link>
+          ))}
+          <Link href="/contact" className={styles.cta}>Get Started</Link>
+        </div>
+
+        {/* Mobile hamburger */}
+        <button className={styles.hamburger} onClick={() => setOpen(o => !o)} aria-label="Toggle menu">
+          <span className={`${styles.bar} ${open ? styles.barTop : ""}`} />
+          <span className={`${styles.bar} ${open ? styles.barMid : ""}`} />
+          <span className={`${styles.bar} ${open ? styles.barBot : ""}`} />
+        </button>
+      </nav>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className={styles.mobileMenu}>
+          {NAV_LINKS.map(l => (
+            <Link key={l.href} href={l.href} className={styles.mobileLink} onClick={() => setOpen(false)}>{l.label}</Link>
+          ))}
+          <Link href="/contact" className={styles.mobileCta} onClick={() => setOpen(false)}>Get Started</Link>
+        </div>
+      )}
+    </header>
+  );
+}

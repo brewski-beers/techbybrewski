@@ -1,0 +1,15 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wide);
+  white-space: nowrap;
+}
+
+.published { background: var(--color-success-muted); color: var(--color-success); }
+.draft     { background: var(--color-warning-muted); color: var(--color-warning); }
+.featured  { background: var(--color-accent-muted);  color: var(--color-accent); }
+.neutral   { background: var(--color-surface-raised); color: var(--color-text-muted); }

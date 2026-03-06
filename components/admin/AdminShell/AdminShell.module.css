@@ -1,0 +1,258 @@
+/* ============================================================
+   AdminShell — Mobile-first layout.
+   Mobile: top header + slide-in drawer.
+   Desktop (1024px+): fixed sidebar + main content area.
+   ============================================================ */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-surface);
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    flex-direction: row;
+  }
+}
+
+/* --- Mobile header (hidden on desktop) --- */
+.mobileHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+@media (min-width: 1024px) {
+  .mobileHeader {
+    display: none;
+  }
+}
+
+.hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+
+.hamburger:hover {
+  background: var(--color-surface);
+}
+
+.mobileBrand {
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  letter-spacing: var(--tracking-tight);
+}
+
+.adminBadge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+  font-weight: var(--font-semibold);
+  font-size: var(--text-xs);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+/* --- Overlay (mobile drawer backdrop) --- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.4);
+  z-index: var(--z-overlay);
+  animation: fadeIn 150ms ease;
+}
+
+@media (min-width: 1024px) {
+  .overlay {
+    display: none;
+  }
+}
+
+/* --- Mobile drawer --- */
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background: var(--color-bg);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-modal);
+  transform: translateX(-100%);
+  transition: transform var(--transition-base);
+  overflow-y: auto;
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+@media (min-width: 1024px) {
+  .drawer {
+    display: none;
+  }
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.drawerBrandGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.closeButton:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+/* --- Desktop sidebar (hidden on mobile) --- */
+.sidebar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--color-bg);
+    border-right: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+.sidebarHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-6) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand {
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  letter-spacing: var(--tracking-tight);
+}
+
+/* --- Shared nav (used in both drawer and sidebar) --- */
+.nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-3);
+  gap: var(--space-1);
+}
+
+.navItem {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.navItem:hover {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.navItemActive {
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+}
+
+.navItemActive:hover {
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+}
+
+/* --- Sidebar footer --- */
+.sidebarFooter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.viewSiteLink {
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.viewSiteLink:hover {
+  color: var(--color-text);
+}
+
+.signOutButton {
+  text-align: left;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.signOutButton:hover {
+  color: var(--color-danger);
+}
+
+/* --- Main content area --- */
+.main {
+  flex: 1;
+  overflow: auto;
+}
+
+.content {
+  padding: var(--space-6) var(--space-4);
+  max-width: 1000px;
+}
+
+@media (min-width: 768px) {
+  .content {
+    padding: var(--space-8) var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .content {
+    padding: var(--space-10);
+  }
+}
