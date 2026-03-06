@@ -36,7 +36,7 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
       await updateService(existing.id, form);
     } else {
       const id = await createService(form);
-      router.push(`/admin/services/${id}`);
+      router.push(`/admin/services/edit?id=${id}`);
       return;
     }
     setSaving(false);

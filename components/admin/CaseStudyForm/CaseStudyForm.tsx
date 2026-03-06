@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "@/lib/storage";
 import { storage } from "@/lib/firebase";
 import { CaseStudy, CaseStudyFormData } from "@/lib/types";
 import { createCaseStudy, updateCaseStudy, publishCaseStudy, unpublishCaseStudy, deleteCaseStudy } from "@/lib/firestore/mutations";
@@ -51,7 +51,7 @@ export default function CaseStudyForm({ existing }: { existing?: CaseStudy }) {
       await updateCaseStudy(existing.id, form);
     } else {
       const id = await createCaseStudy(form);
-      router.push(`/admin/case-studies/${id}`);
+      router.push(`/admin/case-studies/edit?id=${id}`);
       return;
     }
     setSaving(false);

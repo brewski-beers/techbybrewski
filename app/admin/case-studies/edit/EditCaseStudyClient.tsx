@@ -1,14 +1,13 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { use } from "react";
+import { useSearchParams } from "next/navigation";
 import { getCaseStudyById } from "@/lib/firestore/queries";
 import { CaseStudy } from "@/lib/types";
 import CaseStudyForm from "@/components/admin/CaseStudyForm/CaseStudyForm";
 import styles from "./page.module.css";
 
-export default function EditCaseStudyPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function EditCaseStudyClient() {
+  const id = useSearchParams().get("id") ?? "";
   const [item, setItem] = useState<CaseStudy | null>(null);
   const [loading, setLoading] = useState(true);
 

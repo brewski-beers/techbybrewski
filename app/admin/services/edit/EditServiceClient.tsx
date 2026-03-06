@@ -1,14 +1,13 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { use } from "react";
+import { useSearchParams } from "next/navigation";
 import { getServiceById } from "@/lib/firestore/queries";
 import { Service } from "@/lib/types";
 import ServiceForm from "@/components/admin/ServiceForm/ServiceForm";
 import styles from "./page.module.css";
 
-export default function EditServicePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function EditServiceClient() {
+  const id = useSearchParams().get("id") ?? "";
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
 

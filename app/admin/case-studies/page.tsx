@@ -30,7 +30,7 @@ export default function AdminCaseStudiesPage() {
       ) : (
         <div className={styles.list}>
           {items.map((c) => (
-            <Link key={c.id} href={`/admin/case-studies/${c.id}`} className={styles.item}>
+            <Link key={c.id} href={`/admin/case-studies/edit?id=${c.id}`} className={styles.item}>
               <div className={styles.itemMain}>
                 <span className="text-body font-semibold">{c.title}</span>
                 <span className="text-body-sm text-muted">{c.clientName} · {c.industry}</span>

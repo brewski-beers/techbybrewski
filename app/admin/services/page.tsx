@@ -32,7 +32,7 @@ export default function AdminServicesPage() {
       ) : (
         <div className={styles.list}>
           {services.map((s) => (
-            <Link key={s.id} href={`/admin/services/${s.id}`} className={styles.item}>
+            <Link key={s.id} href={`/admin/services/edit?id=${s.id}`} className={styles.item}>
               <div className={styles.itemMain}>
                 <span className="text-body font-semibold">{s.name}</span>
                 <span className="text-body-sm text-muted">/services/{s.slug}</span>

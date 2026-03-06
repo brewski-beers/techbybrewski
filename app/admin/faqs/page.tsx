@@ -19,7 +19,7 @@ export default function AdminFAQsPage() {
       {loading ? <div className={styles.list}>{[1,2].map(n => <div key={n} className={`skeleton ${styles.skeleton}`} />)}</div>
       : items.length === 0 ? <AdminCard><p className="text-body text-muted">No FAQs yet. <Link href="/admin/faqs/new" className="text-accent">Add one →</Link></p></AdminCard>
       : <div className={styles.list}>{items.map(f => (
-          <Link key={f.id} href={`/admin/faqs/${f.id}`} className={styles.item}>
+          <Link key={f.id} href={`/admin/faqs/edit?id=${f.id}`} className={styles.item}>
             <div className={styles.itemMain}>
               <span className="text-body font-semibold">{f.question}</span>
               {f.category && <span className="text-body-sm text-muted">{f.category}</span>}
