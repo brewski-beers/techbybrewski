@@ -40,7 +40,7 @@ export default function HomePage() {
           {settings?.tagline && (
             <p className={`text-overline ${styles.eyebrow}`}>{settings.tagline}</p>
           )}
-          <h1 className={`text-headline ${styles.headline}`}>
+          <h1 className={`text-display ${styles.headline}`}>
             {settings?.heroHeadline || "We build software that scales with you."}
           </h1>
           <p className={`text-body-lg text-muted ${styles.sub}`}>
