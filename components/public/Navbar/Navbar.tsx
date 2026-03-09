@@ -7,7 +7,8 @@ import styles from "./Navbar.module.css";
 const NAV_LINKS = [
   { label: "Services", href: "/services" },
   { label: "Work", href: "/case-studies" },
-  { label: "Contact", href: "/contact" },
+  { label: "Process", href: "/process" },
+  { label: "About", href: "/about" },
 ];
 
 export default function Navbar() {
@@ -26,7 +27,7 @@ export default function Navbar() {
           {NAV_LINKS.map(l => (
             <Link key={l.href} href={l.href} className={`${styles.link} ${pathname.startsWith(l.href) ? styles.linkActive : ""}`}>{l.label}</Link>
           ))}
-          <Link href="/contact" className={styles.cta}>Get Started</Link>
+          <Link href="/contact" className={styles.cta}>Start a Project</Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -43,7 +44,7 @@ export default function Navbar() {
           {NAV_LINKS.map(l => (
             <Link key={l.href} href={l.href} className={styles.mobileLink} onClick={() => setOpen(false)}>{l.label}</Link>
           ))}
-          <Link href="/contact" className={styles.mobileCta} onClick={() => setOpen(false)}>Get Started</Link>
+          <Link href="/contact" className={styles.mobileCta} onClick={() => setOpen(false)}>Start a Project</Link>
         </div>
       )}
     </header>

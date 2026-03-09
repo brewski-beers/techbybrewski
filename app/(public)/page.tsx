@@ -41,20 +41,20 @@ export default function HomePage() {
             <p className={`text-overline ${styles.eyebrow}`}>{settings.tagline}</p>
           )}
           <h1 className={`text-display ${styles.headline}`}>
-            {settings?.heroHeadline || "We build software that scales with you."}
+            {settings?.heroHeadline || "Custom Software and Automation Systems for Growing Businesses"}
           </h1>
           <p className={`text-body-lg text-muted ${styles.sub}`}>
-            {settings?.heroSubheadline || "From internal tools to client-facing platforms — custom-built, Firebase-powered, and production-ready from day one."}
+            {settings?.heroSubheadline || "TechByBrewski designs and builds custom web applications, operational dashboards, and automation systems that help businesses operate more efficiently and scale with clarity."}
           </p>
           <div className={styles.heroCtas}>
             {ctaIsExternal ? (
               <a href={ctaHref} target="_blank" rel="noopener noreferrer" className={styles.ctaPrimary}>
-                Let&apos;s Talk
+                Start a Project
               </a>
             ) : (
-              <Link href={ctaHref} className={styles.ctaPrimary}>Let&apos;s Talk</Link>
+              <Link href={ctaHref} className={styles.ctaPrimary}>Start a Project</Link>
             )}
-            <Link href="/case-studies" className={styles.ctaSecondary}>See Our Work →</Link>
+            <Link href="/case-studies" className={styles.ctaSecondary}>View Our Work →</Link>
           </div>
         </div>
       </section>
@@ -77,6 +77,44 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Systems We Build */}
+      <section className={`section ${styles.sectionAlt}`}>
+        <div className="container">
+          <p className="text-overline">What We Build</p>
+          <h2 className={`text-h2 ${styles.sectionTitle}`}>Systems We Build</h2>
+          <div className={styles.systemsGrid}>
+            {["Operational Dashboards", "Customer Portals", "Inventory & Resource Tracking", "Workflow Automation Tools", "Internal Management Systems", "Data Reporting Platforms"].map(s => (
+              <div key={s} className={styles.systemChip}>{s}</div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Process Preview */}
+      <section className={`section ${styles.section}`}>
+        <div className="container">
+          <p className="text-overline">How We Work</p>
+          <h2 className={`text-h2 ${styles.sectionTitle}`}>Our Process</h2>
+          <div className={styles.processStrip}>
+            {[
+              { step: "01", title: "Discovery", desc: "Understanding your business and operational needs." },
+              { step: "02", title: "System Design", desc: "Planning architecture, workflows, and data models." },
+              { step: "03", title: "Development", desc: "Building secure, scalable software systems." },
+              { step: "04", title: "Launch & Support", desc: "Deployment, improvements, and ongoing support." },
+            ].map(p => (
+              <div key={p.step} className={styles.processStep}>
+                <span className={styles.processNum}>{p.step}</span>
+                <h3 className={`text-h4 ${styles.processTitle}`}>{p.title}</h3>
+                <p className="text-body-sm text-muted">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className={styles.processLink}>
+            <Link href="/process" className={styles.ctaSecondary}>See our full process →</Link>
+          </div>
+        </div>
+      </section>
 
       {/* Featured Case Studies */}
       {caseStudies.length > 0 && (
@@ -137,12 +175,12 @@ export default function HomePage() {
       {/* CTA Banner */}
       <section className={styles.ctaBanner}>
         <div className={`container ${styles.ctaBannerInner}`}>
-          <h2 className={`text-h2 text-inverse ${styles.ctaTitle}`}>Ready to build something?</h2>
-          <p className="text-body-lg text-inverse">Let&apos;s talk about your project.</p>
+          <h2 className={`text-h2 text-inverse ${styles.ctaTitle}`}>Let&apos;s Build Something Useful</h2>
+          <p className="text-body-lg text-inverse">If your business has a process that could be improved with better software, we&apos;d love to learn more about it.</p>
           {ctaIsExternal ? (
-            <a href={ctaHref} target="_blank" rel="noopener noreferrer" className={styles.ctaBannerBtn}>Get in Touch</a>
+            <a href={ctaHref} target="_blank" rel="noopener noreferrer" className={styles.ctaBannerBtn}>Start a Project</a>
           ) : (
-            <Link href={ctaHref} className={styles.ctaBannerBtn}>Get in Touch</Link>
+            <Link href={ctaHref} className={styles.ctaBannerBtn}>Start a Project</Link>
           )}
         </div>
       </section>
