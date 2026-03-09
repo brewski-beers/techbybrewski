@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ref, uploadBytes, getDownloadURL } from "@/lib/storage";
+import { storage } from "@/lib/firebase";
 import { Service, ServiceFormData } from "@/lib/types";
 import { createService, updateService, publishService, unpublishService, deleteService } from "@/lib/firestore/mutations";
 import { getAllServices } from "@/lib/firestore/queries";
@@ -13,7 +15,7 @@ function slugify(s: string) {
 }
 
 const EMPTY: ServiceFormData = {
-  name: "", slug: "", summary: "", bullets: [], useCases: [],
+  name: "", slug: "", summary: "", imageUrl: "", bullets: [], useCases: [],
   order: 0, isActive: true, isPublished: false,
 };
 
@@ -25,9 +27,10 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<ServiceFormData>(existing ?? EMPTY);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  // Auto-set order to count + 1 when creating a new service
   useEffect(() => {
     if (!existing) {
       getAllServices().then((sv) => setForm((f) => ({ ...f, order: sv.length + 1 })));
@@ -36,6 +39,18 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
 
   const set = (key: keyof ServiceFormData, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !form.slug) return alert("Set a slug before uploading an image.");
+    setUploading(true);
+    const storageRef = ref(storage, `site/services/${form.slug}/${Date.now()}-${file.name}`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    set("imageUrl", url);
+    setUploading(false);
+    e.target.value = "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +102,23 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
           label="Summary" value={form.summary} rows={3} required
           onChange={(e) => set("summary", e.target.value)}
         />
+      </AdminCard>
+
+      <AdminCard>
+        <h2 className={`text-h4 ${styles.cardTitle}`}>Feature Image</h2>
+        {form.imageUrl && (
+          <div className={styles.imagePreview}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- admin preview, dimensions unknown */}
+            <img src={form.imageUrl} alt="Service feature image" className={styles.thumbnail} />
+            <button type="button" onClick={() => set("imageUrl", "")} className={styles.removeImage}>
+              Remove
+            </button>
+          </div>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} className={styles.fileInput} />
+        <AdminButton type="button" variant="secondary" loading={uploading} onClick={() => fileRef.current?.click()}>
+          {uploading ? "Uploading..." : form.imageUrl ? "Replace Image" : "Upload Image"}
+        </AdminButton>
       </AdminCard>
 
       <AdminCard>

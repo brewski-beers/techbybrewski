@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { Service } from "@/lib/types";
 import styles from "./page.module.css";
@@ -10,6 +11,11 @@ export default function ServiceDetailClient({ service }: { service: Service }) {
         <Link href="/services" className={`text-label text-muted ${styles.back}`}>← Services</Link>
         <h1 className={`text-headline ${styles.title}`}>{service.name}</h1>
         <p className={`text-body-lg text-muted ${styles.summary}`}>{service.summary}</p>
+        {service.imageUrl && (
+          <div className={styles.imageWrapper}>
+            <Image src={service.imageUrl} alt={service.name} fill className={styles.image} sizes="(min-width: 768px) 768px, 100vw" />
+          </div>
+        )}
 
         <div className={styles.cols}>
           {service.bullets.length > 0 && (
