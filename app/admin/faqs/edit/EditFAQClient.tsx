@@ -45,7 +45,6 @@ export default function EditFAQClient() {
           <AdminInput label="Question" value={form.question} required onChange={e => set("question", e.target.value)} />
           <AdminTextarea label="Answer" value={form.answer} rows={4} required onChange={e => set("answer", e.target.value)} />
           <AdminInput label="Category" value={form.category} onChange={e => set("category", e.target.value)} />
-          <AdminInput label="Display Order" type="number" value={form.order} onChange={e => set("order", Number(e.target.value))} />
           <AdminToggle label="Published" checked={form.isPublished} onChange={v => set("isPublished", v)} />
         </AdminCard>
         <div className={styles.actions}>

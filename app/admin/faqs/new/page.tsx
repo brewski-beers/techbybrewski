@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createFAQ } from "@/lib/firestore/mutations";
+import { getAllFAQs } from "@/lib/firestore/queries";
 import { FAQFormData } from "@/lib/types";
 import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminCard } from "@/components/admin/ui";
 import styles from "@/styles/adminForm.module.css";
@@ -13,6 +14,12 @@ export default function NewFAQPage() {
   const [form, setForm] = useState<FAQFormData>(EMPTY);
   const [saving, setSaving] = useState(false);
   const set = (k: keyof FAQFormData, v: unknown) => setForm(f => ({ ...f, [k]: v }));
+
+  // Auto-set order to count + 1
+  useEffect(() => {
+    getAllFAQs().then(items => setForm(f => ({ ...f, order: items.length + 1 })));
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true);
     await createFAQ(form);
@@ -27,7 +34,6 @@ export default function NewFAQPage() {
           <AdminInput label="Question" value={form.question} required onChange={e => set("question", e.target.value)} />
           <AdminTextarea label="Answer" value={form.answer} rows={4} required onChange={e => set("answer", e.target.value)} />
           <AdminInput label="Category" value={form.category} hint="Optional grouping label" onChange={e => set("category", e.target.value)} />
-          <AdminInput label="Display Order" type="number" value={form.order} onChange={e => set("order", Number(e.target.value))} />
           <AdminToggle label="Published" checked={form.isPublished} onChange={v => set("isPublished", v)} />
         </AdminCard>
         <div className={styles.actions}>
