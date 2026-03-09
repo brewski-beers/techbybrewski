@@ -12,7 +12,7 @@ export default function Footer() {
       <div className={`container ${styles.inner}`}>
         <div className={styles.brand}>
           <span className={styles.logo}>{settings?.brandName || "TechByBrewski"}</span>
-          <p className="text-body-sm text-muted">
+          <p className={`text-body-sm ${styles.tagline}`}>
             {settings?.tagline || "Custom software & Firebase solutions for growing businesses."}
           </p>
           {/* Social links */}
@@ -43,7 +43,7 @@ export default function Footer() {
         </nav>
       </div>
       <div className={`container ${styles.bottom}`}>
-        <p className="text-caption text-muted">
+        <p className={`text-caption ${styles.copyright}`}>
           © {new Date().getFullYear()} {settings?.brandName || "TechByBrewski"}. All rights reserved.
         </p>
         {settings?.contactEmail && (
