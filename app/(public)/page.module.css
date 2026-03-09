@@ -95,6 +95,63 @@
 .sectionAlt { background: var(--color-surface); }
 .sectionTitle { margin-top: var(--space-3); margin-bottom: var(--space-10); }
 
+/* ── Systems We Build ─────────────────────────────────────── */
+.systemsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.systemChip {
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text);
+}
+
+/* ── Process Preview ──────────────────────────────────────── */
+.processStrip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+
+@media (min-width: 640px) {
+  .processStrip { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .processStrip { grid-template-columns: repeat(4, 1fr); }
+}
+
+.processStep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+}
+
+.processNum {
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-accent);
+}
+
+.processTitle { }
+
+.processLink {
+  margin-top: var(--space-8);
+}
+
 /* ── Services ─────────────────────────────────────────────── */
 .serviceGrid { margin-top: var(--space-8); }
 
