@@ -31,6 +31,7 @@ export interface Service {
   name: string;
   slug: string;
   summary: string;
+  imageUrl: string;
   bullets: string[];
   useCases: string[];
   order: number;

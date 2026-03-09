@@ -134,6 +134,7 @@ export async function getServiceBySlugRest(slug: string): Promise<Service | null
     name: (d.name as string) ?? "",
     slug: (d.slug as string) ?? "",
     summary: (d.summary as string) ?? "",
+    imageUrl: (d.imageUrl as string) ?? "",
     bullets: (d.bullets as string[]) ?? [],
     useCases: (d.useCases as string[]) ?? [],
     order: (d.order as number) ?? 0,
