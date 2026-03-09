@@ -1,0 +1,30 @@
+.handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--color-text-subtle);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  flex-shrink: 0;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.handle:hover {
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+}
+
+.handle:active {
+  cursor: grabbing;
+}
+
+.item {
+  background: var(--color-bg);
+}
+
+.dragging {
+  opacity: 0.5;
+  z-index: var(--z-raised);
+}

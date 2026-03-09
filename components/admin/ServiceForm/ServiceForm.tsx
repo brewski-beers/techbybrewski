@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Service, ServiceFormData } from "@/lib/types";
 import { createService, updateService, publishService, unpublishService, deleteService } from "@/lib/firestore/mutations";
+import { getAllServices } from "@/lib/firestore/queries";
 import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminArrayField, AdminCard } from "@/components/admin/ui";
 import styles from "./ServiceForm.module.css";
 
@@ -25,6 +26,13 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
   const [form, setForm] = useState<ServiceFormData>(existing ?? EMPTY);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Auto-set order to count + 1 when creating a new service
+  useEffect(() => {
+    if (!existing) {
+      getAllServices().then((sv) => setForm((f) => ({ ...f, order: sv.length + 1 })));
+    }
+  }, [existing]);
 
   const set = (key: keyof ServiceFormData, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -78,10 +86,6 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
         <AdminTextarea
           label="Summary" value={form.summary} rows={3} required
           onChange={(e) => set("summary", e.target.value)}
-        />
-        <AdminInput
-          label="Display Order" type="number" value={form.order}
-          onChange={(e) => set("order", Number(e.target.value))}
         />
       </AdminCard>
 

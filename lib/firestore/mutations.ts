@@ -7,6 +7,7 @@ import {
   updateDoc,
   deleteDoc,
   serverTimestamp,
+  writeBatch,
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import type {
@@ -148,4 +149,25 @@ export async function updateFAQ(id: string, data: Partial<FAQFormData>): Promise
 export async function deleteFAQ(id: string, question: string): Promise<void> {
   await deleteDoc(doc(db, "faqs", id));
   await log("DELETE", "faqs", id, `Deleted FAQ: ${question}`);
+}
+
+// ── Reorder (batch) ────────────────────────────────────────
+
+async function reorderCollection(
+  collectionName: string,
+  items: { id: string; order: number }[]
+): Promise<void> {
+  const batch = writeBatch(db);
+  items.forEach(({ id, order }) => {
+    batch.update(doc(db, collectionName, id), { order });
+  });
+  await batch.commit();
+}
+
+export async function reorderServices(items: { id: string; order: number }[]): Promise<void> {
+  await reorderCollection("services", items);
+}
+
+export async function reorderFAQs(items: { id: string; order: number }[]): Promise<void> {
+  await reorderCollection("faqs", items);
 }
