@@ -1,14 +1,15 @@
-"use client";
-import { useEffect, useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { getPublishedServices } from "@/lib/firestore/queries";
-import { Service } from "@/lib/types";
+import { getPublishedServicesRest } from "@/lib/firestore/rest";
 import styles from "./page.module.css";
 
-export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => { getPublishedServices().then(setServices).finally(() => setLoading(false)); }, []);
+export const metadata: Metadata = {
+  title: "Services",
+  description: "Custom software solutions built for real business outcomes — operational dashboards, customer portals, workflow automation, and more.",
+};
+
+export default async function ServicesPage() {
+  const services = await getPublishedServicesRest();
 
   return (
     <div className="section">
@@ -17,10 +18,8 @@ export default function ServicesPage() {
         <h1 className={`text-headline ${styles.title}`}>Services</h1>
         <p className={`text-body-lg text-muted ${styles.intro}`}>Custom software solutions built for real business outcomes.</p>
 
-        {loading ? (
-          <div className={`grid-3 grid gap-6 ${styles.grid}`}>
-            {[1,2,3].map(n => <div key={n} className={`skeleton ${styles.cardSkeleton}`} />)}
-          </div>
+        {services.length === 0 ? (
+          <p className="text-body text-muted">Services coming soon.</p>
         ) : (
           <div className={`grid-3 grid gap-6 ${styles.grid}`}>
             {services.map(s => (

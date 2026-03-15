@@ -1,17 +1,14 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ref, uploadBytes, getDownloadURL } from "@/lib/storage";
 import { storage } from "@/lib/firebase";
 import { CaseStudy, CaseStudyFormData } from "@/lib/types";
 import { createCaseStudy, updateCaseStudy, publishCaseStudy, unpublishCaseStudy, deleteCaseStudy } from "@/lib/firestore/mutations";
 import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminArrayField, AdminCard } from "@/components/admin/ui";
+import { slugify } from "@/lib/utils";
 import styles from "./CaseStudyForm.module.css";
-
-function slugify(s: string) {
-  return s.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-}
 
 const EMPTY: CaseStudyFormData = {
   title: "", slug: "", clientName: "", industry: "", overview: "",
@@ -22,56 +19,88 @@ const EMPTY: CaseStudyFormData = {
 export default function CaseStudyForm({ existing }: { existing?: CaseStudy }) {
   const router = useRouter();
   const [form, setForm] = useState<CaseStudyFormData>(existing ?? EMPTY);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, startSave] = useTransition();
+  const [isDeleting, startDelete] = useTransition();
+  const [isUploading, startUpload] = useTransition();
+  const [, startPublish] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const set = (key: keyof CaseStudyFormData, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }));
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !form.slug) return alert("Set a slug before uploading images.");
-    setUploading(true);
-    const storageRef = ref(storage, `site/caseStudies/${form.slug}/${Date.now()}-${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    set("images", [...form.images, { url, alt: file.name.replace(/\.[^.]+$/, ""), order: form.images.length }]);
-    setUploading(false);
-    e.target.value = "";
+    if (!file) return;
+    if (!form.slug) {
+      setError("Set a slug before uploading images.");
+      return;
+    }
+    setError(null);
+    startUpload(async () => {
+      try {
+        const storageRef = ref(storage, `site/caseStudies/${form.slug}/${Date.now()}-${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        set("images", [...form.images, { url, alt: file.name.replace(/\.[^.]+$/, ""), order: form.images.length }]);
+        e.target.value = "";
+      } catch {
+        setError("Image upload failed. Please try again.");
+      }
+    });
   };
 
   const removeImage = (i: number) => set("images", form.images.filter((_, idx) => idx !== i));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-    if (existing) {
-      await updateCaseStudy(existing.id, form);
-    } else {
-      const id = await createCaseStudy(form);
-      router.push(`/admin/case-studies/edit?id=${id}`);
+    if (!form.title.trim() || !form.slug.trim() || !form.overview.trim()) {
+      setError("Title, slug, and overview are required.");
       return;
     }
-    setSaving(false);
+    setError(null);
+    startSave(async () => {
+      try {
+        if (existing) {
+          await updateCaseStudy(existing.id, form);
+        } else {
+          const id = await createCaseStudy(form);
+          router.push(`/admin/case-studies/edit?id=${id}`);
+        }
+      } catch {
+        setError("Save failed. Please try again.");
+      }
+    });
   };
 
-  const handlePublishToggle = async () => {
+  const handlePublishToggle = () => {
     if (!existing) return;
-    if (form.isPublished) {
-      await unpublishCaseStudy(existing.id, form.title);
-    } else {
-      await publishCaseStudy(existing.id, form.title, existing.isPublished);
-    }
-    set("isPublished", !form.isPublished);
+    setError(null);
+    startPublish(async () => {
+      try {
+        if (form.isPublished) {
+          await unpublishCaseStudy(existing.id, form.title);
+        } else {
+          await publishCaseStudy(existing.id, form.title, existing.isPublished);
+        }
+        set("isPublished", !form.isPublished);
+      } catch {
+        setError("Failed to update publish status.");
+      }
+    });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!existing || !confirm(`Delete "${form.title}"? This cannot be undone.`)) return;
-    setDeleting(true);
-    await deleteCaseStudy(existing.id, form.title);
-    router.push("/admin/case-studies");
+    setError(null);
+    startDelete(async () => {
+      try {
+        await deleteCaseStudy(existing.id, form.title);
+        router.push("/admin/case-studies");
+      } catch {
+        setError("Delete failed. Please try again.");
+      }
+    });
   };
 
   return (
@@ -114,8 +143,8 @@ export default function CaseStudyForm({ existing }: { existing?: CaseStudy }) {
           </div>
         )}
         <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} className={styles.fileInput} />
-        <AdminButton type="button" variant="secondary" loading={uploading} onClick={() => fileRef.current?.click()}>
-          {uploading ? "Uploading..." : "Upload Image"}
+        <AdminButton type="button" variant="secondary" loading={isUploading} onClick={() => fileRef.current?.click()}>
+          {isUploading ? "Uploading..." : "Upload Image"}
         </AdminButton>
       </AdminCard>
 
@@ -125,10 +154,12 @@ export default function CaseStudyForm({ existing }: { existing?: CaseStudy }) {
         {existing && <AdminToggle label="Published" hint="Visible on public site" checked={form.isPublished} onChange={handlePublishToggle} />}
       </AdminCard>
 
+      {error && <p className={styles.errorMsg}>{error}</p>}
+
       <div className={styles.actions}>
-        {existing && <AdminButton type="button" variant="danger" loading={deleting} onClick={handleDelete}>Delete</AdminButton>}
+        {existing && <AdminButton type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>Delete</AdminButton>}
         <AdminButton type="button" variant="secondary" onClick={() => router.push("/admin/case-studies")}>Cancel</AdminButton>
-        <AdminButton type="submit" loading={saving}>{existing ? "Save Changes" : "Create Case Study"}</AdminButton>
+        <AdminButton type="submit" loading={isSaving}>{existing ? "Save Changes" : "Create Case Study"}</AdminButton>
       </div>
     </form>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ref, uploadBytes, getDownloadURL } from "@/lib/storage";
 import { storage } from "@/lib/firebase";
@@ -8,11 +8,8 @@ import { Service, ServiceFormData } from "@/lib/types";
 import { createService, updateService, publishService, unpublishService, deleteService } from "@/lib/firestore/mutations";
 import { getAllServices } from "@/lib/firestore/queries";
 import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminArrayField, AdminCard } from "@/components/admin/ui";
+import { slugify } from "@/lib/utils";
 import styles from "./ServiceForm.module.css";
-
-function slugify(s: string) {
-  return s.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-}
 
 const EMPTY: ServiceFormData = {
   name: "", slug: "", summary: "", imageUrl: "", bullets: [], useCases: [],
@@ -26,9 +23,11 @@ interface ServiceFormProps {
 export default function ServiceForm({ existing }: ServiceFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<ServiceFormData>(existing ?? EMPTY);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, startSave] = useTransition();
+  const [isDeleting, startDelete] = useTransition();
+  const [isUploading, startUpload] = useTransition();
+  const [, startPublish] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -40,46 +39,76 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
   const set = (key: keyof ServiceFormData, value: unknown) =>
     setForm((f) => ({ ...f, [key]: value }));
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !form.slug) return alert("Set a slug before uploading an image.");
-    setUploading(true);
-    const storageRef = ref(storage, `site/services/${form.slug}/${Date.now()}-${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    set("imageUrl", url);
-    setUploading(false);
-    e.target.value = "";
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    if (existing) {
-      await updateService(existing.id, form);
-    } else {
-      const id = await createService(form);
-      router.push(`/admin/services/edit?id=${id}`);
+    if (!file) return;
+    if (!form.slug) {
+      setError("Set a slug before uploading an image.");
       return;
     }
-    setSaving(false);
+    setError(null);
+    startUpload(async () => {
+      try {
+        const storageRef = ref(storage, `site/services/${form.slug}/${Date.now()}-${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        set("imageUrl", url);
+        e.target.value = "";
+      } catch {
+        setError("Image upload failed. Please try again.");
+      }
+    });
   };
 
-  const handlePublishToggle = async () => {
-    if (!existing) return;
-    if (form.isPublished) {
-      await unpublishService(existing.id, form.name);
-    } else {
-      await publishService(existing.id, form.name);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.slug.trim() || !form.summary.trim()) {
+      setError("Name, slug, and summary are required.");
+      return;
     }
-    set("isPublished", !form.isPublished);
+    setError(null);
+    startSave(async () => {
+      try {
+        if (existing) {
+          await updateService(existing.id, form);
+        } else {
+          const id = await createService(form);
+          router.push(`/admin/services/edit?id=${id}`);
+        }
+      } catch {
+        setError("Save failed. Please try again.");
+      }
+    });
   };
 
-  const handleDelete = async () => {
+  const handlePublishToggle = () => {
+    if (!existing) return;
+    setError(null);
+    startPublish(async () => {
+      try {
+        if (form.isPublished) {
+          await unpublishService(existing.id, form.name);
+        } else {
+          await publishService(existing.id, form.name);
+        }
+        set("isPublished", !form.isPublished);
+      } catch {
+        setError("Failed to update publish status.");
+      }
+    });
+  };
+
+  const handleDelete = () => {
     if (!existing || !confirm(`Delete "${form.name}"? This cannot be undone.`)) return;
-    setDeleting(true);
-    await deleteService(existing.id, form.name);
-    router.push("/admin/services");
+    setError(null);
+    startDelete(async () => {
+      try {
+        await deleteService(existing.id, form.name);
+        router.push("/admin/services");
+      } catch {
+        setError("Delete failed. Please try again.");
+      }
+    });
   };
 
   return (
@@ -116,8 +145,8 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
           </div>
         )}
         <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} className={styles.fileInput} />
-        <AdminButton type="button" variant="secondary" loading={uploading} onClick={() => fileRef.current?.click()}>
-          {uploading ? "Uploading..." : form.imageUrl ? "Replace Image" : "Upload Image"}
+        <AdminButton type="button" variant="secondary" loading={isUploading} onClick={() => fileRef.current?.click()}>
+          {isUploading ? "Uploading..." : form.imageUrl ? "Replace Image" : "Upload Image"}
         </AdminButton>
       </AdminCard>
 
@@ -131,20 +160,27 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
         <h2 className={`text-h4 ${styles.cardTitle}`}>Visibility</h2>
         <AdminToggle label="Active" hint="Show in services listing" checked={form.isActive} onChange={(v) => set("isActive", v)} />
         {existing && (
-          <AdminToggle label="Published" hint="Visible on public site" checked={form.isPublished} onChange={handlePublishToggle} />
+          <AdminToggle
+            label="Published"
+            hint="Visible on public site"
+            checked={form.isPublished}
+            onChange={handlePublishToggle}
+          />
         )}
       </AdminCard>
 
+      {error && <p className={styles.errorMsg}>{error}</p>}
+
       <div className={styles.actions}>
         {existing && (
-          <AdminButton type="button" variant="danger" loading={deleting} onClick={handleDelete}>
+          <AdminButton type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>
             Delete
           </AdminButton>
         )}
         <AdminButton type="button" variant="secondary" onClick={() => router.push("/admin/services")}>
           Cancel
         </AdminButton>
-        <AdminButton type="submit" loading={saving}>
+        <AdminButton type="submit" loading={isSaving}>
           {existing ? "Save Changes" : "Create Service"}
         </AdminButton>
       </div>

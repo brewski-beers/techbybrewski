@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useOptimistic, useTransition } from "react";
 import Link from "next/link";
 import { getAllServices } from "@/lib/firestore/queries";
 import { reorderServices } from "@/lib/firestore/mutations";
@@ -12,14 +12,25 @@ import styles from "@/styles/adminList.module.css";
 export default function AdminServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reorderError, setReorderError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [optimisticServices, setOptimisticServices] = useOptimistic(services);
 
   useEffect(() => {
     getAllServices().then(setServices).finally(() => setLoading(false));
   }, []);
 
-  const handleReorder = async (reordered: Service[]) => {
-    setServices(reordered);
-    await reorderServices(reordered.map((s, i) => ({ id: s.id, order: i + 1 })));
+  const handleReorder = (reordered: Service[]) => {
+    setReorderError(null);
+    startTransition(async () => {
+      setOptimisticServices(reordered);
+      try {
+        await reorderServices(reordered.map((s, i) => ({ id: s.id, order: i + 1 })));
+        setServices(reordered);
+      } catch {
+        setReorderError("Reorder failed. Please try again.");
+      }
+    });
   };
 
   return (
@@ -34,13 +45,15 @@ export default function AdminServicesPage() {
         </Link>
       </div>
 
+      {reorderError && <p className={styles.errorMsg}>{reorderError}</p>}
+
       {loading ? (
         <div className={styles.list}>{[1, 2, 3].map((n) => <div key={n} className={`skeleton ${styles.skeleton}`} />)}</div>
       ) : services.length === 0 ? (
         <AdminCard><p className="text-body text-muted">No services yet. <Link href="/admin/services/new" className="text-accent">Create one →</Link></p></AdminCard>
       ) : (
-        <div className={styles.list}>
-          <SortableList items={services} onReorder={handleReorder}>
+        <div className={`${styles.list} ${isPending ? styles.listPending : ""}`}>
+          <SortableList items={optimisticServices} onReorder={handleReorder}>
             {(s, handleProps) => (
               <div className={styles.item}>
                 <DragHandle listeners={handleProps.listeners} attributes={handleProps.attributes} />

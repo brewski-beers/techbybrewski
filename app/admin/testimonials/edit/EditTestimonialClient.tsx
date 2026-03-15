@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ref, uploadBytes, getDownloadURL } from "@/lib/storage";
 import { storage } from "@/lib/firebase";
@@ -14,9 +14,10 @@ export default function EditTestimonialClient() {
   const router = useRouter();
   const [item, setItem] = useState<Testimonial | null>(null);
   const [form, setForm] = useState<TestimonialFormData | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, startSave] = useTransition();
+  const [isDeleting, startDelete] = useTransition();
+  const [isUploading, startUpload] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -25,31 +26,51 @@ export default function EditTestimonialClient() {
 
   const set = (k: keyof TestimonialFormData, v: unknown) => setForm(f => f ? { ...f, [k]: v } : f);
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    const storageRef = ref(storage, `site/testimonials/${Date.now()}-${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    set("avatarUrl", url);
-    setUploading(false);
-    e.target.value = "";
+    setError(null);
+    startUpload(async () => {
+      try {
+        const storageRef = ref(storage, `site/testimonials/${Date.now()}-${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        set("avatarUrl", url);
+        e.target.value = "";
+      } catch {
+        setError("Avatar upload failed. Please try again.");
+      }
+    });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form) return;
-    setSaving(true);
-    await updateTestimonial(id, form);
-    setSaving(false);
+    if (!form.quote.trim() || !form.name.trim()) {
+      setError("Quote and name are required.");
+      return;
+    }
+    setError(null);
+    startSave(async () => {
+      try {
+        await updateTestimonial(id, form);
+      } catch {
+        setError("Save failed. Please try again.");
+      }
+    });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!item || !confirm(`Delete testimonial from "${item.name}"?`)) return;
-    setDeleting(true);
-    await deleteTestimonial(id, item.name);
-    router.push("/admin/testimonials");
+    setError(null);
+    startDelete(async () => {
+      try {
+        await deleteTestimonial(id, item.name);
+        router.push("/admin/testimonials");
+      } catch {
+        setError("Delete failed. Please try again.");
+      }
+    });
   };
 
   if (!form) return <div className={`skeleton ${styles.formSkeleton}`} />;
@@ -76,8 +97,8 @@ export default function EditTestimonialClient() {
             </div>
           )}
           <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatarUpload} className={styles.fileInput} />
-          <AdminButton type="button" variant="secondary" loading={uploading} onClick={() => fileRef.current?.click()}>
-            {uploading ? "Uploading..." : form.avatarUrl ? "Replace Photo" : "Upload Photo"}
+          <AdminButton type="button" variant="secondary" loading={isUploading} onClick={() => fileRef.current?.click()}>
+            {isUploading ? "Uploading..." : form.avatarUrl ? "Replace Photo" : "Upload Photo"}
           </AdminButton>
         </AdminCard>
 
@@ -87,10 +108,12 @@ export default function EditTestimonialClient() {
           <AdminToggle label="Published" checked={form.isPublished} onChange={v => set("isPublished", v)} />
         </AdminCard>
 
+        {error && <p className={styles.errorMsg}>{error}</p>}
+
         <div className={styles.actions}>
-          <AdminButton type="button" variant="danger" loading={deleting} onClick={handleDelete}>Delete</AdminButton>
+          <AdminButton type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>Delete</AdminButton>
           <AdminButton type="button" variant="secondary" onClick={() => router.push("/admin/testimonials")}>Cancel</AdminButton>
-          <AdminButton type="submit" loading={saving}>Save</AdminButton>
+          <AdminButton type="submit" loading={isSaving}>Save</AdminButton>
         </div>
       </form>
     </div>

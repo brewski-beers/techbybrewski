@@ -1,15 +1,16 @@
-"use client";
+import type { Metadata } from "next";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getPublishedCaseStudies } from "@/lib/firestore/queries";
-import { CaseStudy } from "@/lib/types";
+import { getPublishedCaseStudiesRest } from "@/lib/firestore/rest";
 import styles from "./page.module.css";
 
-export default function CaseStudiesPage() {
-  const [items, setItems] = useState<CaseStudy[]>([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => { getPublishedCaseStudies().then(setItems).finally(() => setLoading(false)); }, []);
+export const metadata: Metadata = {
+  title: "Case Studies",
+  description: "Real projects. Real outcomes. See how TechByBrewski has helped businesses solve operational challenges with custom software.",
+};
+
+export default async function CaseStudiesPage() {
+  const items = await getPublishedCaseStudiesRest();
 
   return (
     <div className="section">
@@ -18,9 +19,7 @@ export default function CaseStudiesPage() {
         <h1 className={`text-headline ${styles.title}`}>Case Studies</h1>
         <p className={`text-body-lg text-muted ${styles.intro}`}>Real projects. Real outcomes.</p>
 
-        {loading ? (
-          <div className={`grid gap-6 ${styles.grid}`}>{[1,2,3].map(n => <div key={n} className={`skeleton ${styles.skeleton}`} />)}</div>
-        ) : items.length === 0 ? (
+        {items.length === 0 ? (
           <p className="text-body text-muted">Case studies coming soon.</p>
         ) : (
           <div className={`grid gap-6 ${styles.grid}`}>
