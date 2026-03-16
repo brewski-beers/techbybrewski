@@ -1,30 +1,20 @@
-"use client";
-
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSiteSettings } from "@/lib/context/SiteSettingsContext";
-import { getPublishedServices, getFeaturedCaseStudies, getPublishedTestimonials } from "@/lib/firestore/queries";
-import { Service, CaseStudy, Testimonial } from "@/lib/types";
+import {
+  getSiteSettingsRest,
+  getPublishedServicesRest,
+  getFeaturedCaseStudiesRest,
+  getPublishedTestimonialsRest,
+} from "@/lib/firestore/rest";
 import styles from "./page.module.css";
 
-export default function HomePage() {
-  const settings = useSiteSettings();
-  const [services, setServices] = useState<Service[]>([]);
-  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-
-  useEffect(() => {
-    Promise.all([
-      getPublishedServices(),
-      getFeaturedCaseStudies(3),
-      getPublishedTestimonials(),
-    ]).then(([sv, cs, t]) => {
-      setServices(sv);
-      setCaseStudies(cs);
-      setTestimonials(t);
-    });
-  }, []);
+export default async function HomePage() {
+  const [settings, services, caseStudies, testimonials] = await Promise.all([
+    getSiteSettingsRest(),
+    getPublishedServicesRest(),
+    getFeaturedCaseStudiesRest(3),
+    getPublishedTestimonialsRest(),
+  ]);
 
   const ctaHref =
     settings?.primaryCTAType === "calendly" && settings?.calendlyUrl

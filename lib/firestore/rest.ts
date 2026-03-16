@@ -4,7 +4,7 @@
  * No Firebase SDK — plain fetch over HTTP.
  */
 
-import { Service, CaseStudy, CaseStudyImage } from "@/lib/types";
+import { Service, CaseStudy, CaseStudyImage, Testimonial, SiteSettings } from "@/lib/types";
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!;
 const API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY!;
@@ -53,7 +53,9 @@ interface FieldFilter {
 async function runQuery(
   collectionId: string,
   filters: FieldFilter[],
-  orderBy?: { field: string; direction?: "ASCENDING" | "DESCENDING" }
+  orderBy?: { field: string; direction?: "ASCENDING" | "DESCENDING" },
+  limitTo?: number,
+  cache: RequestCache = "no-store"
 ): Promise<Array<Record<string, unknown> & { id: string }>> {
   function toFsValue(val: string | number | boolean): FsValue {
     if (typeof val === "string") return { stringValue: val };
@@ -96,12 +98,20 @@ async function runQuery(
     ];
   }
 
+  if (limitTo) {
+    (body.structuredQuery as Record<string, unknown>).limit = limitTo;
+  }
+
   const res = await fetch(`${BASE}:runQuery?key=${API_KEY}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    cache: "no-store", // always fresh at build time
+    cache,
   });
+
+  if (!res.ok) {
+    throw new Error(`Firestore REST query failed: ${res.status} ${res.statusText}`);
+  }
 
   const rows = (await res.json()) as Array<{
     document?: { name: string; fields: Record<string, FsValue> };
@@ -116,6 +126,157 @@ async function runQuery(
 }
 
 // ── Public query helpers ───────────────────────────────────────
+
+// ── Single-document fetch ──────────────────────────────────────
+
+async function getDocument(
+  collectionId: string,
+  docId: string
+): Promise<Record<string, unknown> | null> {
+  const res = await fetch(`${BASE}/${collectionId}/${docId}?key=${API_KEY}`, {
+    cache: "no-store",
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`Firestore REST getDocument failed: ${res.status} ${res.statusText}`);
+  }
+  const doc = (await res.json()) as { fields?: Record<string, FsValue> };
+  if (!doc.fields) return null;
+  return decodeMap(doc.fields);
+}
+
+export async function getSiteSettingsRest(): Promise<SiteSettings | null> {
+  const d = await getDocument("siteSettings", "main");
+  if (!d) return null;
+  const socialLinks = (d.socialLinks as Record<string, unknown>) ?? {};
+  const seoDefaults = (d.seoDefaults as Record<string, unknown>) ?? {};
+  return {
+    brandName: (d.brandName as string) ?? "",
+    tagline: (d.tagline as string) ?? "",
+    heroHeadline: (d.heroHeadline as string) ?? "",
+    heroSubheadline: (d.heroSubheadline as string) ?? "",
+    primaryCTAType: ((d.primaryCTAType as string) ?? "contact") as "calendly" | "contact",
+    calendlyUrl: (d.calendlyUrl as string) ?? "",
+    contactEmail: (d.contactEmail as string) ?? "",
+    socialLinks: {
+      linkedin: (socialLinks.linkedin as string) ?? "",
+      github: (socialLinks.github as string) ?? "",
+      instagram: (socialLinks.instagram as string) ?? "",
+    },
+    seoDefaults: {
+      titleTemplate: (seoDefaults.titleTemplate as string) ?? "",
+      defaultDescription: (seoDefaults.defaultDescription as string) ?? "",
+    },
+  };
+}
+
+export async function getPublishedServicesRest(): Promise<Service[]> {
+  const docs = await runQuery(
+    "services",
+    [{ field: "isPublished", op: "EQUAL", value: true }],
+    { field: "order", direction: "ASCENDING" }
+  );
+  return docs.map((d) => ({
+    id: d.id,
+    name: (d.name as string) ?? "",
+    slug: (d.slug as string) ?? "",
+    summary: (d.summary as string) ?? "",
+    imageUrl: (d.imageUrl as string) ?? "",
+    bullets: (d.bullets as string[]) ?? [],
+    useCases: (d.useCases as string[]) ?? [],
+    order: (d.order as number) ?? 0,
+    isActive: (d.isActive as boolean) ?? false,
+    isPublished: (d.isPublished as boolean) ?? false,
+  }));
+}
+
+export async function getFeaturedCaseStudiesRest(max = 3): Promise<CaseStudy[]> {
+  const docs = await runQuery(
+    "caseStudies",
+    [
+      { field: "isPublished", op: "EQUAL", value: true },
+      { field: "featured", op: "EQUAL", value: true },
+    ],
+    { field: "order", direction: "ASCENDING" },
+    max
+  );
+  return docs.map((d) => {
+    const rawImages = (d.images as Array<Record<string, unknown>>) ?? [];
+    return {
+      id: d.id,
+      title: (d.title as string) ?? "",
+      slug: (d.slug as string) ?? "",
+      clientName: (d.clientName as string) ?? "",
+      industry: (d.industry as string) ?? "",
+      overview: (d.overview as string) ?? "",
+      problem: (d.problem as string[]) ?? [],
+      solution: (d.solution as string[]) ?? [],
+      outcomes: (d.outcomes as string[]) ?? [],
+      stack: (d.stack as string[]) ?? [],
+      images: rawImages.map((img) => ({
+        url: (img.url as string) ?? "",
+        alt: (img.alt as string) ?? "",
+        order: (img.order as number) ?? 0,
+      })),
+      featured: (d.featured as boolean) ?? false,
+      order: (d.order as number) ?? 0,
+      publishedAt: null,
+      updatedAt: null,
+      isPublished: (d.isPublished as boolean) ?? false,
+    };
+  });
+}
+
+export async function getPublishedCaseStudiesRest(): Promise<CaseStudy[]> {
+  const docs = await runQuery(
+    "caseStudies",
+    [{ field: "isPublished", op: "EQUAL", value: true }],
+    { field: "order", direction: "ASCENDING" }
+  );
+  return docs.map((d) => {
+    const rawImages = (d.images as Array<Record<string, unknown>>) ?? [];
+    return {
+      id: d.id,
+      title: (d.title as string) ?? "",
+      slug: (d.slug as string) ?? "",
+      clientName: (d.clientName as string) ?? "",
+      industry: (d.industry as string) ?? "",
+      overview: (d.overview as string) ?? "",
+      problem: (d.problem as string[]) ?? [],
+      solution: (d.solution as string[]) ?? [],
+      outcomes: (d.outcomes as string[]) ?? [],
+      stack: (d.stack as string[]) ?? [],
+      images: rawImages.map((img) => ({
+        url: (img.url as string) ?? "",
+        alt: (img.alt as string) ?? "",
+        order: (img.order as number) ?? 0,
+      })),
+      featured: (d.featured as boolean) ?? false,
+      order: (d.order as number) ?? 0,
+      publishedAt: null,
+      updatedAt: null,
+      isPublished: (d.isPublished as boolean) ?? false,
+    };
+  });
+}
+
+export async function getPublishedTestimonialsRest(): Promise<Testimonial[]> {
+  const docs = await runQuery(
+    "testimonials",
+    [{ field: "isPublished", op: "EQUAL", value: true }],
+    { field: "order", direction: "ASCENDING" }
+  );
+  return docs.map((d) => ({
+    id: d.id,
+    quote: (d.quote as string) ?? "",
+    name: (d.name as string) ?? "",
+    title: (d.title as string) ?? "",
+    company: (d.company as string) ?? "",
+    avatarUrl: (d.avatarUrl as string) ?? "",
+    order: (d.order as number) ?? 0,
+    isPublished: (d.isPublished as boolean) ?? false,
+  }));
+}
 
 export async function getPublishedServiceSlugs(): Promise<string[]> {
   const docs = await runQuery("services", [{ field: "isPublished", op: "EQUAL", value: true }]);

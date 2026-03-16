@@ -27,3 +27,4 @@
   cursor: pointer;
 }
 .removeAvatar:hover { text-decoration: underline; }
+.errorMsg { font-size: var(--text-sm); color: var(--color-danger); padding: var(--space-3) var(--space-4); background: var(--color-error-muted, #fef2f2); border-radius: var(--radius-md); border: 1px solid var(--color-danger); }

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getFAQById } from "@/lib/firestore/queries";
 import { updateFAQ, deleteFAQ } from "@/lib/firestore/mutations";
@@ -12,26 +12,42 @@ export default function EditFAQClient() {
   const router = useRouter();
   const [item, setItem] = useState<FAQ | null>(null);
   const [form, setForm] = useState<FAQFormData | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, startSave] = useTransition();
+  const [isDeleting, startDelete] = useTransition();
 
   useEffect(() => { getFAQById(id).then(f => { setItem(f); if (f) setForm(f); }); }, [id]);
 
   const set = (k: keyof FAQFormData, v: unknown) => setForm(f => f ? { ...f, [k]: v } : f);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form) return;
-    setSaving(true);
-    await updateFAQ(id, form);
-    setSaving(false);
+    if (!form.question.trim() || !form.answer.trim()) {
+      setError("Question and answer are required.");
+      return;
+    }
+    setError(null);
+    startSave(async () => {
+      try {
+        await updateFAQ(id, form);
+      } catch {
+        setError("Save failed. Please try again.");
+      }
+    });
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!item || !confirm("Delete this FAQ?")) return;
-    setDeleting(true);
-    await deleteFAQ(id, item.question);
-    router.push("/admin/faqs");
+    setError(null);
+    startDelete(async () => {
+      try {
+        await deleteFAQ(id, item.question);
+        router.push("/admin/faqs");
+      } catch {
+        setError("Delete failed. Please try again.");
+      }
+    });
   };
 
   if (!form) return <div className={`skeleton ${styles.formSkeleton}`} />;
@@ -47,10 +63,13 @@ export default function EditFAQClient() {
           <AdminInput label="Category" value={form.category} onChange={e => set("category", e.target.value)} />
           <AdminToggle label="Published" checked={form.isPublished} onChange={v => set("isPublished", v)} />
         </AdminCard>
+
+        {error && <p className={styles.errorMsg}>{error}</p>}
+
         <div className={styles.actions}>
-          <AdminButton type="button" variant="danger" loading={deleting} onClick={handleDelete}>Delete</AdminButton>
+          <AdminButton type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>Delete</AdminButton>
           <AdminButton type="button" variant="secondary" onClick={() => router.push("/admin/faqs")}>Cancel</AdminButton>
-          <AdminButton type="submit" loading={saving}>Save</AdminButton>
+          <AdminButton type="submit" loading={isSaving}>Save</AdminButton>
         </div>
       </form>
     </div>

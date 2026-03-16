@@ -46,6 +46,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ---- Contact Submissions ----
+    // Anyone can create (public contact form); only admins can read
+    match /contactSubmissions/{id} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
     // ---- Activity Log ----
     // Admins can write and read; no public access
     match /activityLog/{id} {

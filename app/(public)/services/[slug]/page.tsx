@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPublishedServiceSlugs, getServiceBySlugRest } from "@/lib/firestore/rest";
 import ServiceDetailClient from "./ServiceDetailClient";
@@ -5,6 +6,25 @@ import ServiceDetailClient from "./ServiceDetailClient";
 export async function generateStaticParams() {
   const slugs = await getPublishedServiceSlugs();
   return slugs.map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const service = await getServiceBySlugRest(slug);
+  if (!service) return {};
+  return {
+    title: service.name,
+    description: service.summary,
+    openGraph: {
+      title: service.name,
+      description: service.summary,
+      ...(service.imageUrl ? { images: [{ url: service.imageUrl }] } : {}),
+    },
+  };
 }
 
 export default async function ServiceDetailPage({
