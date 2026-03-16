@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CaseStudiesPage() {
-  const items = await getPublishedCaseStudiesRest();
+  const items = await getPublishedCaseStudiesRest().catch(() => []);
 
   return (
     <div className="section">

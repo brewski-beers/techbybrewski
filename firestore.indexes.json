@@ -49,13 +49,6 @@
         { "fieldPath": "order", "order": "ASCENDING" }
       ]
     }
-    {
-      "collectionGroup": "activityLog",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    }
   ],
   "fieldOverrides": []
 }
