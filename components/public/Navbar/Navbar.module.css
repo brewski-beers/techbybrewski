@@ -62,7 +62,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--space-2) var(--space-5);
-  background: linear-gradient(135deg, var(--color-accent), #3b82f6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
   color: var(--color-text-inverse);
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
@@ -123,7 +123,7 @@
   justify-content: center;
   margin-top: var(--space-2);
   padding: var(--space-3);
-  background: linear-gradient(135deg, var(--color-accent), #3b82f6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
   color: var(--color-text-inverse);
   font-weight: var(--font-medium);
   border-radius: var(--radius-md);

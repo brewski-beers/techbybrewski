@@ -43,7 +43,7 @@
 .ctaBtn {
   display: inline-flex; align-items: center;
   padding: var(--space-3) var(--space-8);
-  background: linear-gradient(135deg, var(--color-accent), #3b82f6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
   color: var(--color-text-inverse);
   font-weight: var(--font-semibold); border-radius: var(--radius-full);
   transition: opacity var(--transition-fast), transform var(--transition-fast);

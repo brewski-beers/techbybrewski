@@ -37,7 +37,7 @@
 
 /* ── Who We Help ──────────────────────────────────────────── */
 .whoIntro {
-  max-width: 600px;
+  max-width: var(--container-sm);
   margin-bottom: var(--space-8);
 }
 
@@ -76,7 +76,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--space-3) var(--space-8);
-  background: linear-gradient(135deg, var(--color-accent), #3b82f6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
   color: var(--color-text-inverse);
   font-weight: var(--font-semibold);
   border-radius: var(--radius-full);

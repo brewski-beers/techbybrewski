@@ -13,7 +13,7 @@ export default async function CaseStudiesPage() {
   const items = await getPublishedCaseStudiesRest().catch(() => []);
 
   return (
-    <div className="section">
+    <section className="section">
       <div className="container">
         <p className="text-overline">Our Work</p>
         <h1 className={`text-headline ${styles.title}`}>Case Studies</h1>
@@ -43,6 +43,6 @@ export default async function CaseStudiesPage() {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }

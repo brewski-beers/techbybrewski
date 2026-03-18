@@ -5,7 +5,7 @@
 
 .title { margin-top: var(--space-3); margin-bottom: var(--space-5); }
 
-.intro { max-width: 600px; }
+.intro { max-width: var(--container-sm); }
 
 /* ── Steps ────────────────────────────────────────────────── */
 .steps {
@@ -61,7 +61,6 @@
   padding-bottom: var(--space-10);
 }
 
-.stepTitle { }
 
 /* ── CTA ──────────────────────────────────────────────────── */
 .cta {
@@ -78,7 +77,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--space-3) var(--space-8);
-  background: linear-gradient(135deg, var(--color-accent), #3b82f6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
   color: var(--color-text-inverse);
   font-weight: var(--font-semibold);
   border-radius: var(--radius-full);
