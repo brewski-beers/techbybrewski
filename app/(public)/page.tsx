@@ -116,7 +116,7 @@ export default async function HomePage() {
               {caseStudies.map(c => (
                 <Link key={c.id} href={`/case-studies/${c.slug}`} className={styles.caseCard}>
                   {c.images?.[0] && (
-                    <Image src={c.images[0].url} alt={c.images[0].alt} className={styles.caseImg} width={600} height={400} />
+                    <Image src={c.images[0].url} alt={c.images[0].alt} className={styles.caseImg} width={600} height={400} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" />
                   )}
                   <div className={styles.caseBody}>
                     <p className="text-caption text-muted">{c.industry}</p>

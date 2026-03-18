@@ -12,7 +12,7 @@ export default async function ServicesPage() {
   const services = await getPublishedServicesRest();
 
   return (
-    <div className="section">
+    <section className="section">
       <div className="container">
         <p className="text-overline">What We Do</p>
         <h1 className={`text-headline ${styles.title}`}>Services</h1>
@@ -31,12 +31,12 @@ export default async function ServicesPage() {
                     {s.bullets.slice(0, 3).map((b, i) => <li key={i} className="text-body-sm">{b}</li>)}
                   </ul>
                 )}
-                <span className="text-label text-accent">Learn more →</span>
+                <span className={`text-label text-accent ${styles.cta}`}>Learn more →</span>
               </Link>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }

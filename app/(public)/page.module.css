@@ -51,7 +51,7 @@
   background-clip: text;
 }
 
-.sub { max-width: 600px; }
+.sub { max-width: var(--container-sm); }
 
 .heroCtas {
   display: flex;
@@ -64,7 +64,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--space-3) var(--space-8);
-  background: linear-gradient(135deg, var(--color-accent), #3b82f6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
   color: var(--color-text-inverse);
   font-weight: var(--font-semibold);
   border-radius: var(--radius-full);
@@ -146,7 +146,6 @@
   color: var(--color-accent);
 }
 
-.processTitle { }
 
 .processLink {
   margin-top: var(--space-8);
@@ -255,7 +254,7 @@
 
 /* ── CTA Banner ───────────────────────────────────────────── */
 .ctaBanner {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(135deg, var(--color-surface-dark) 0%, var(--color-surface-dark-raised) 100%);
   padding-top: var(--space-20);
   padding-bottom: var(--space-20);
 }
@@ -277,7 +276,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--space-3) var(--space-8);
-  background: linear-gradient(135deg, var(--color-accent), #3b82f6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
   color: var(--color-text-inverse);
   font-weight: var(--font-semibold);
   border-radius: var(--radius-full);

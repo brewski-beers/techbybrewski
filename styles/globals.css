@@ -9,6 +9,7 @@
   --color-primary-hover: #1a1a1a;
   --color-accent: #2563eb;
   --color-accent-hover: #1d4ed8;
+  --color-accent-light: #3b82f6;
   --color-accent-muted: #eff6ff;
 
   /* --- Surfaces --- */
@@ -24,6 +25,10 @@
   --color-text-subtle: #94a3b8;
   --color-text-inverse: #ffffff;
   --color-text-accent: #2563eb;
+
+  /* --- Dark surfaces --- */
+  --color-surface-dark: #0f172a;
+  --color-surface-dark-raised: #1e293b;
 
   /* --- Status --- */
   --color-success: #16a34a;
@@ -189,4 +194,11 @@ p {
 code,
 pre {
   font-family: var(--font-mono);
+}
+
+/* --- Focus --- */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
 }

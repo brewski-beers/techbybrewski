@@ -22,7 +22,7 @@ export default function CaseStudyDetailClient({ item }: { item: CaseStudy }) {
         {item.images.length > 0 && (
           <div className={styles.gallery}>
             {item.images.sort((a, b) => a.order - b.order).map((img, i) => (
-              <Image key={i} src={img.url} alt={img.alt} className={styles.galleryImg} width={1200} height={675} />
+              <Image key={i} src={img.url} alt={img.alt} className={styles.galleryImg} width={1200} height={675} sizes="(min-width: 640px) 50vw, 100vw" />
             ))}
           </div>
         )}

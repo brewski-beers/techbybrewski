@@ -30,6 +30,10 @@ export const metadata: Metadata = {
     siteName: "TechByBrewski",
     type: "website",
     locale: "en_US",
+    title: "TechByBrewski — Custom Software & Firebase Solutions",
+    description: "TechByBrewski builds custom web applications, internal tools, and Firebase-powered systems for growing businesses.",
+    url: "https://techbybrewski.com",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "TechByBrewski" }],
   },
 };
 

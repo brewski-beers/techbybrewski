@@ -4,6 +4,7 @@
 .grid {
   margin-top: var(--space-4);
   counter-reset: service-count;
+  align-items: stretch;
 }
 
 .cardSkeleton { height: 280px; border-radius: var(--radius-xl); }
@@ -29,7 +30,14 @@
 }
 .card:hover { border-color: var(--color-accent); box-shadow: var(--shadow-md); transform: translateY(-2px); }
 
-.summary { flex: 1; }
+.summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cta { margin-top: auto; }
 
 .bullets {
   display: flex;

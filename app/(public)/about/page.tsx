@@ -36,7 +36,7 @@ const VALUES = [
 
 export default function AboutPage() {
   return (
-    <div className="section">
+    <section className="section">
       <div className="container">
 
         {/* Mission */}
@@ -87,6 +87,6 @@ export default function AboutPage() {
         </div>
 
       </div>
-    </div>
+    </section>
   );
 }

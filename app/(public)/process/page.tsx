@@ -42,7 +42,7 @@ const STEPS = [
 
 export default function ProcessPage() {
   return (
-    <div className="section">
+    <section className="section">
       <div className="container">
         <div className={styles.header}>
           <p className="text-overline">How We Work</p>
@@ -73,6 +73,6 @@ export default function ProcessPage() {
           <Link href="/contact" className={styles.ctaBtn}>Start a Project →</Link>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
