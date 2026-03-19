@@ -1,17 +1,26 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
   getSiteSettingsRest,
-  getPublishedServicesRest,
   getFeaturedCaseStudiesRest,
   getPublishedTestimonialsRest,
 } from "@/lib/firestore/rest";
 import styles from "./page.module.css";
 
+export const metadata: Metadata = {
+  title: "TechByBrewski — Custom Software & Automation for Growing Businesses",
+  description: "TechByBrewski designs and builds custom web applications, operational dashboards, and automation systems that help businesses operate more efficiently and scale with clarity.",
+  openGraph: {
+    title: "TechByBrewski — Custom Software & Automation for Growing Businesses",
+    description: "TechByBrewski designs and builds custom web applications, operational dashboards, and automation systems that help businesses operate more efficiently and scale with clarity.",
+    url: "https://techbybrewski.com",
+  },
+};
+
 export default async function HomePage() {
-  const [settings, services, caseStudies, testimonials] = await Promise.all([
+  const [settings, caseStudies, testimonials] = await Promise.all([
     getSiteSettingsRest(),
-    getPublishedServicesRest(),
     getFeaturedCaseStudiesRest(3),
     getPublishedTestimonialsRest(),
   ]);
@@ -49,34 +58,21 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Services */}
-      {services.length > 0 && (
-        <section className={`section ${styles.section}`}>
-          <div className="container">
-            <p className="text-overline">What We Do</p>
-            <h2 className={`text-h2 ${styles.sectionTitle}`}>Services</h2>
-            <div className={`grid-3 grid gap-6 ${styles.serviceGrid}`}>
-              {services.map(s => (
-                <Link key={s.id} href={`/services/${s.slug}`} className={styles.serviceCard}>
-                  <h3 className="text-h4">{s.name}</h3>
-                  <p className={`text-body-sm text-muted ${styles.serviceSum}`}>{s.summary}</p>
-                  <span className={`text-label text-accent ${styles.learn}`}>Learn more →</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Systems We Build */}
       <section className={`section ${styles.sectionAlt}`}>
         <div className="container">
           <p className="text-overline">What We Build</p>
           <h2 className={`text-h2 ${styles.sectionTitle}`}>Systems We Build</h2>
+          <p className={`text-body-lg text-muted ${styles.sectionIntro}`}>
+            If your business runs on spreadsheets, manual handoffs, or disconnected tools — these are the systems we replace them with.
+          </p>
           <div className={styles.systemsGrid}>
             {["Operational Dashboards", "Customer Portals", "Inventory & Resource Tracking", "Workflow Automation Tools", "Internal Management Systems", "Data Reporting Platforms"].map(s => (
               <div key={s} className={styles.systemChip}>{s}</div>
             ))}
+          </div>
+          <div className={styles.systemsLink}>
+            <Link href="/services" className={styles.ctaSecondary}>View our service offerings →</Link>
           </div>
         </div>
       </section>
@@ -101,7 +97,7 @@ export default async function HomePage() {
             ))}
           </div>
           <div className={styles.processLink}>
-            <Link href="/process" className={styles.ctaSecondary}>See our full process →</Link>
+            <Link href="/contact" className={styles.ctaSecondary}>Start a conversation →</Link>
           </div>
         </div>
       </section>

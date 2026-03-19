@@ -96,6 +96,13 @@
 .sectionTitle { margin-top: var(--space-3); margin-bottom: var(--space-10); }
 
 /* ── Systems We Build ─────────────────────────────────────── */
+.sectionIntro {
+  max-width: var(--container-sm);
+  margin-top: var(--space-3);
+}
+
+.systemsLink { margin-top: var(--space-8); }
+
 .systemsGrid {
   display: flex;
   flex-wrap: wrap;
@@ -151,30 +158,6 @@
   margin-top: var(--space-8);
 }
 
-/* ── Services ─────────────────────────────────────────────── */
-.serviceGrid { margin-top: var(--space-8); }
-
-.serviceCard {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-6);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-}
-
-.sectionAlt .serviceCard { background: var(--color-surface); }
-
-.serviceCard:hover {
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.serviceSum { flex: 1; }
-.learn { margin-top: auto; }
 
 /* ── Case Studies ─────────────────────────────────────────── */
 .caseGrid {
