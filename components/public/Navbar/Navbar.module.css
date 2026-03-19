@@ -92,6 +92,66 @@
 .barMid  { opacity: 0; }
 .barBot  { transform: translateY(-7px) rotate(-45deg); }
 
+/* Services dropdown */
+.dropdown {
+  position: relative;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  z-index: var(--z-dropdown);
+}
+
+.dropdown:hover .dropdownMenu,
+.dropdown:focus-within .dropdownMenu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdownAll {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-accent);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+.dropdownAll:hover { background: var(--color-surface); }
+
+.dropdownDivider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-1) var(--space-3);
+}
+
+.dropdownItem {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.dropdownItem:hover { background: var(--color-surface); color: var(--color-text); }
+.dropdownItemActive { color: var(--color-text); font-weight: var(--font-medium); }
+
 /* Mobile menu */
 .mobileMenu {
   display: flex;
@@ -114,8 +174,63 @@
   color: var(--color-text);
   border-radius: var(--radius-md);
   transition: background var(--transition-fast);
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-family: inherit;
 }
 .mobileLink:hover { background: var(--color-surface); }
+.mobileLinkActive { color: var(--color-accent); }
+
+.mobileLinkToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chevron {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+.chevronOpen { transform: rotate(180deg); }
+
+.mobileSubLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-4);
+  margin-bottom: var(--space-1);
+}
+
+.mobileSubLinkAll {
+  display: block;
+  padding: var(--space-2) var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-accent);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+.mobileSubLinkAll:hover { background: var(--color-surface); }
+
+.mobileSubLink {
+  display: block;
+  padding: var(--space-2) var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.mobileSubLink:hover { background: var(--color-surface); color: var(--color-text); }
 
 .mobileCta {
   display: flex;
