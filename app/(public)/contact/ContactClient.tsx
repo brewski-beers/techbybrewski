@@ -26,9 +26,9 @@ export default function ContactClient() {
         <div className={styles.header}>
           <p className="text-overline">Start a Project</p>
           <h1 className={`text-headline ${styles.title}`}>Let&apos;s Build Something Useful</h1>
-          <p className="text-body-lg text-muted">Tell us about your business and the system or project you&apos;re considering. We&apos;ll review the details and follow up to discuss next steps.</p>
+          <p className={`text-body-lg ${styles.headerBody}`}>Tell us about your business and the system or project you&apos;re considering. We&apos;ll review the details and follow up to discuss next steps.</p>
           {settings?.contactEmail && (
-            <p className="text-body-sm text-muted">Or email us directly at <a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a></p>
+            <p className={`text-body-sm ${styles.headerBody}`}>Or email us directly at <a href={`mailto:${settings.contactEmail}`} className={styles.emailLink}>{settings.contactEmail}</a></p>
           )}
         </div>
 

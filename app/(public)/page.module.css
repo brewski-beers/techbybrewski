@@ -10,7 +10,9 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37, 99, 235, 0.07) 0%, transparent 70%);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79, 70, 229, 0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 20%, rgba(249, 115, 22, 0.04) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -45,10 +47,11 @@
 
 .headline {
   letter-spacing: var(--tracking-tight);
-  background: linear-gradient(135deg, var(--color-text) 0%, #334155 100%);
+  background: linear-gradient(135deg, #334155 30%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-weight: var(--font-extrabold);
 }
 
 .sub { max-width: var(--container-sm); }
@@ -60,40 +63,41 @@
   margin-top: var(--space-4);
 }
 
-.ctaPrimary {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--space-3) var(--space-8);
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
-  color: var(--color-text-inverse);
-  font-weight: var(--font-semibold);
-  border-radius: var(--radius-full);
-  font-size: var(--text-base);
-  transition: opacity var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
-  min-height: 48px;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-}
-.ctaPrimary:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-}
-
-.ctaSecondary {
-  display: inline-flex;
-  align-items: center;
-  color: var(--color-text-muted);
-  font-weight: var(--font-medium);
-  font-size: var(--text-base);
-  transition: color var(--transition-fast);
-  min-height: 48px;
-}
-.ctaSecondary:hover { color: var(--color-text); }
 
 /* ── Sections ─────────────────────────────────────────────── */
 .section { background: var(--color-bg); }
 .sectionAlt { background: var(--color-surface); }
 .sectionTitle { margin-top: var(--space-3); margin-bottom: var(--space-10); }
+
+.sectionDark {
+  background: linear-gradient(160deg, var(--color-surface-dark) 0%, var(--color-surface-dark-raised) 100%);
+  color: var(--color-text-inverse);
+}
+
+.sectionDark .sectionTitle,
+.sectionDark h2,
+.sectionDark h3 {
+  color: var(--color-text-inverse);
+}
+
+.sectionDark p {
+  color: rgba(255, 255, 255, 0.70);
+}
+
+.sectionDark .systemChip {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sectionDark :global(.btn-secondary) {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.sectionDark :global(.btn-secondary):hover {
+  color: var(--color-text-inverse);
+}
+
 
 /* ── Systems We Build ─────────────────────────────────────── */
 .sectionIntro {
@@ -144,6 +148,7 @@
   background: var(--color-surface);
   border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-warm-sm);
 }
 
 .processNum {
@@ -179,6 +184,7 @@
   border-radius: var(--radius-xl);
   overflow: hidden;
   transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  box-shadow: var(--shadow-warm-sm);
 }
 .caseCard:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
 
@@ -221,6 +227,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-warm-sm);
 }
 
 .quote { font-style: italic; color: var(--color-text); }
@@ -256,17 +263,5 @@
 .ctaTitle { max-width: 500px; }
 
 .ctaBannerBtn {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--space-3) var(--space-8);
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
-  color: var(--color-text-inverse);
-  font-weight: var(--font-semibold);
-  border-radius: var(--radius-full);
-  font-size: var(--text-base);
   white-space: nowrap;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
-  min-height: 48px;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
-.ctaBannerBtn:hover { opacity: 0.92; transform: translateY(-1px); }

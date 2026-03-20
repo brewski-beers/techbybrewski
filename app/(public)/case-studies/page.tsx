@@ -7,6 +7,8 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Case Studies",
   description: "Real projects. Real outcomes. See how TechByBrewski has helped businesses solve operational challenges with custom software.",
+  openGraph: { images: ["/og-image.png"] },
+  alternates: { canonical: "/case-studies" },
 };
 
 export default async function CaseStudiesPage() {

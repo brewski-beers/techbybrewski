@@ -6,6 +6,8 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Services",
   description: "Custom software solutions built for real business outcomes — operational dashboards, customer portals, workflow automation, and more.",
+  openGraph: { images: ["/og-image.png"] },
+  alternates: { canonical: "/services" },
 };
 
 export default async function ServicesPage() {

@@ -37,7 +37,9 @@ export default function ServiceDetailClient({ service }: { service: Service }) {
         </div>
 
         <div className={styles.cta}>
-          <Link href="/contact" className={styles.ctaBtn}>Start a Project →</Link>
+          <h2 className="text-h3">Ready to get started?</h2>
+          <p className="text-body text-muted">Tell us about your project and we&apos;ll walk you through how we&apos;d approach it.</p>
+          <Link href="/contact" className="btn-primary">Start a Project →</Link>
         </div>
       </div>
     </div>

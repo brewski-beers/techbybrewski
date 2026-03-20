@@ -1,11 +1,15 @@
 .mission {
   max-width: var(--container-md);
   margin-bottom: var(--space-20);
+  padding: var(--space-12) var(--space-10);
+  background: var(--color-surface-warm);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--color-border);
 }
 
 .title { margin-top: var(--space-3); margin-bottom: var(--space-6); }
 
-.missionText { max-width: 640px; }
+.missionText { max-width: 640px; color: var(--color-text); }
 
 /* ── Sections ─────────────────────────────────────────────── */
 .section {
@@ -33,6 +37,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-warm-sm);
 }
 
 /* ── Who We Help ──────────────────────────────────────────── */
@@ -67,22 +72,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding-top: var(--space-12);
-  border-top: 1px solid var(--color-border);
   max-width: var(--container-md);
+  background: var(--color-surface-warm);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10);
+  border: 1px solid var(--color-border);
 }
 
-.ctaBtn {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--space-3) var(--space-8);
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
-  color: var(--color-text-inverse);
-  font-weight: var(--font-semibold);
-  border-radius: var(--radius-full);
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
-  min-height: 48px;
-  align-self: flex-start;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-}
-.ctaBtn:hover { opacity: 0.9; transform: translateY(-1px); }

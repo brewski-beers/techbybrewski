@@ -21,19 +21,25 @@ const jakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: {
     template: "%s | TechByBrewski",
-    default: "TechByBrewski — Custom Software & Firebase Solutions",
+    default: "TechByBrewski — Custom Software & Automation",
   },
   description:
-    "TechByBrewski builds custom web applications, internal tools, and Firebase-powered systems for growing businesses.",
+    "Custom web applications, dashboards, and automation systems built by TechByBrewski.",
   metadataBase: new URL("https://techbybrewski.com"),
   openGraph: {
     siteName: "TechByBrewski",
     type: "website",
     locale: "en_US",
-    title: "TechByBrewski — Custom Software & Firebase Solutions",
-    description: "TechByBrewski builds custom web applications, internal tools, and Firebase-powered systems for growing businesses.",
+    title: "TechByBrewski — Custom Software & Automation",
+    description: "Custom web applications, dashboards, and automation systems built by TechByBrewski.",
     url: "https://techbybrewski.com",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "TechByBrewski" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TechByBrewski — Custom Software & Automation",
+    description: "Custom web applications, dashboards, and automation systems built by TechByBrewski.",
+    images: ["/og-image.png"],
   },
 };
 
