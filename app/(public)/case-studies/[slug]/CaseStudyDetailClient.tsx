@@ -50,7 +50,7 @@ export default function CaseStudyDetailClient({ item }: { item: CaseStudy }) {
 
         <div className={styles.cta}>
           <h2 className="text-h3">Ready to build something similar?</h2>
-          <Link href="/contact" className={styles.ctaBtn}>Let&apos;s Talk →</Link>
+          <Link href="/contact" className="btn-primary">Let&apos;s Talk →</Link>
         </div>
       </div>
     </article>

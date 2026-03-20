@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ScrollReveal from "@/components/public/ScrollReveal";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "About",
   description: "TechByBrewski builds custom software systems and automation tools that help businesses operate more efficiently and grow with clarity.",
+  openGraph: { images: ["/og-image.png"] },
+  alternates: { canonical: "/about" },
 };
 
 const WHO_WE_HELP = [
@@ -43,7 +46,7 @@ export default function AboutPage() {
         <div className={styles.mission}>
           <p className="text-overline">About Us</p>
           <h1 className={`text-headline ${styles.title}`}>We Build Software That Works</h1>
-          <p className={`text-body-lg text-muted ${styles.missionText}`}>
+          <p className={`text-body-lg ${styles.missionText}`}>
             TechByBrewski is a custom software studio focused on building operational systems, automation tools, and digital infrastructure for growing businesses. We believe the best software is the kind that makes a business run better — not just the kind that looks good.
           </p>
         </div>
@@ -53,11 +56,13 @@ export default function AboutPage() {
           <p className="text-overline">Our Approach</p>
           <h2 className={`text-h2 ${styles.sectionTitle}`}>How We Think</h2>
           <div className={styles.valuesGrid}>
-            {VALUES.map(v => (
-              <div key={v.title} className={styles.valueCard}>
-                <h3 className="text-h4">{v.title}</h3>
-                <p className="text-body text-muted">{v.desc}</p>
-              </div>
+            {VALUES.map((v, i) => (
+              <ScrollReveal key={v.title} delay={([0, 100, 200, 300] as const)[i]}>
+                <div className={styles.valueCard}>
+                  <h3 className="text-h4">{v.title}</h3>
+                  <p className="text-body text-muted">{v.desc}</p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         </section>
@@ -83,7 +88,7 @@ export default function AboutPage() {
         <div className={styles.cta}>
           <h2 className="text-h3">Have a project in mind?</h2>
           <p className="text-body text-muted">Tell us about your business and what you&apos;re looking to build.</p>
-          <Link href="/contact" className={styles.ctaBtn}>Start a Project →</Link>
+          <Link href="/contact" className="btn-primary">Start a Project →</Link>
         </div>
 
       </div>

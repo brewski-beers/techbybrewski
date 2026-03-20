@@ -43,7 +43,7 @@
 .navLink {
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.65);
   transition: color var(--transition-fast);
 }
 .navLink:hover { color: var(--color-text-inverse); }
@@ -61,7 +61,7 @@
 
 .copy {
   font-size: var(--text-sm);
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.60);
 }
 
 .socials {
@@ -72,7 +72,7 @@
 .social {
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.6);
   transition: color var(--transition-fast);
 }
 .social:hover { color: var(--color-text-inverse); }

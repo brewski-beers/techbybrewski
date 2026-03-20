@@ -82,7 +82,7 @@
   font-weight: var(--font-semibold);
   letter-spacing: var(--tracking-widest);
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: #64748b;
 }
 
 /* --- Color modifiers --- */

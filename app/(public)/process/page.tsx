@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ScrollReveal from "@/components/public/ScrollReveal";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Our Process",
   description: "How TechByBrewski takes projects from idea to launch — discovery, system design, development, testing, and ongoing support.",
+  openGraph: { images: ["/og-image.png"] },
+  alternates: { canonical: "/process" },
 };
 
 const STEPS = [
@@ -50,27 +53,30 @@ export default function ProcessPage() {
           <p className={`text-body-lg text-muted ${styles.intro}`}>
             Every project follows a structured process built around clarity, communication, and delivering software that actually solves the problem.
           </p>
+          <Link href="/contact" className={styles.midCta}>Have questions? Let&apos;s talk →</Link>
         </div>
 
         <div className={styles.steps}>
-          {STEPS.map((s) => (
-            <div key={s.num} className={styles.step}>
-              <div className={styles.stepLeft}>
-                <span className={styles.stepNum}>{s.num}</span>
-                <div className={styles.stepLine} />
+          {STEPS.map((s, index) => (
+            <ScrollReveal key={s.num} delay={([0, 100, 200, 300, 400, 500] as const)[index]}>
+              <div className={styles.step}>
+                <div className={styles.stepLeft}>
+                  <span className={styles.stepNum}>{s.num}</span>
+                  <div className={styles.stepLine} />
+                </div>
+                <div className={styles.stepContent}>
+                  <h2 className={`text-h3 ${styles.stepTitle}`}>{s.title}</h2>
+                  <p className="text-body text-muted">{s.desc}</p>
+                </div>
               </div>
-              <div className={styles.stepContent}>
-                <h2 className={`text-h3 ${styles.stepTitle}`}>{s.title}</h2>
-                <p className="text-body text-muted">{s.desc}</p>
-              </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
 
         <div className={styles.cta}>
           <h2 className="text-h3">Ready to get started?</h2>
           <p className="text-body text-muted">Tell us about your project and we&apos;ll walk you through how we&apos;d approach it.</p>
-          <Link href="/contact" className={styles.ctaBtn}>Start a Project →</Link>
+          <Link href="/contact" className="btn-primary">Start a Project →</Link>
         </div>
       </div>
     </section>

@@ -12,6 +12,7 @@ interface NavService {
 
 const STATIC_LINKS = [
   { label: "Work", href: "/case-studies" },
+  { label: "Process", href: "/process" },
   { label: "About", href: "/about" },
 ];
 
@@ -37,11 +38,13 @@ export default function Navbar({ services = [] }: { services?: NavService[] }) {
             <Link
               href="/services"
               className={`${styles.link} ${servicesActive ? styles.linkActive : ""}`}
+              aria-haspopup="true"
+              aria-expanded={services.length > 0 ? undefined : false}
             >
               Services
             </Link>
             {services.length > 0 && (
-              <div className={styles.dropdownMenu}>
+              <div className={styles.dropdownMenu} role="menu" aria-label="Services">
                 <Link href="/services" className={styles.dropdownAll}>
                   All Services →
                 </Link>

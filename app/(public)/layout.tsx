@@ -11,8 +11,9 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <SiteSettingsProvider>
       <div className={styles.wrapper}>
+        <a href="#main-content" className="skip-link">Skip to content</a>
         <Navbar services={navServices} />
-        <main className={styles.main}>{children}</main>
+        <main id="main-content" className={styles.main}>{children}</main>
         <Footer />
       </div>
     </SiteSettingsProvider>
