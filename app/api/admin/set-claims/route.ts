@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const decoded = await adminAuth.verifyIdToken(idToken);
     if (!decoded.admin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 401 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { uid, claims } = await req.json();
