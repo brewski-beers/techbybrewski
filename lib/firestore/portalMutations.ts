@@ -128,6 +128,21 @@ export async function deleteClientDocument(
   await deleteDoc(doc(db, "clients", clientUid, category, docId));
 }
 
+// ── Contract Signature (admin) ──────────────────────────────────
+
+export async function updateContractSignature(
+  clientUid: string,
+  docId: string,
+  signatureUrl: string | null,
+  signatureStatus: "none" | "pending" | "signed"
+): Promise<void> {
+  await updateDoc(doc(db, "clients", clientUid, "contracts", docId), {
+    signatureUrl,
+    signatureStatus,
+    updatedAt: serverTimestamp(),
+  });
+}
+
 // ── Mercury (admin) ─────────────────────────────────────────────
 
 /**

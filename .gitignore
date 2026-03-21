@@ -36,6 +36,9 @@ next-env.d.ts
 # OS
 .DS_Store
 
+# claude code
+.claude/
+
 # seed script credentials - NEVER COMMIT
 scripts/service-account.json
 firebase-debug.log

@@ -9,11 +9,11 @@ import {
   getClientContracts,
   getClientInvoices,
 } from "@/lib/firestore/portalQueries";
-import { updateInvoiceStatus } from "@/lib/firestore/portalMutations";
+import { updateInvoiceStatus, updateContractSignature } from "@/lib/firestore/portalMutations";
 import DocumentList from "@/components/portal/DocumentList/DocumentList";
 import FileUpload from "@/components/portal/FileUpload/FileUpload";
 import MessageThread from "@/components/portal/MessageThread/MessageThread";
-import { Button, Badge, Card } from "@/components/ui";
+import { Button, Badge, Card, Input } from "@/components/ui";
 import { INVOICE_STATUS_VARIANT, INVOICE_STATUS_LABEL } from "@/lib/constants/invoiceStatus";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import type {
@@ -34,6 +34,12 @@ const DOC_CATEGORIES: { key: DocumentCategory; label: string }[] = [
   { key: "assets", label: "Assets" },
   { key: "files", label: "Other Files" },
 ];
+
+const SIGNATURE_VARIANT: Record<ClientContract["signatureStatus"], "published" | "draft" | "neutral"> = {
+  signed: "published",
+  pending: "draft",
+  none: "neutral",
+};
 
 export default function AdminClientViewPage() {
   const searchParams = useSearchParams();
@@ -146,11 +152,140 @@ function DocumentsTab({ clientId }: { clientId: string }) {
       <div className={styles.docList}>
         {loading ? (
           <div className={styles.empty}>Loading…</div>
+        ) : activeCategory === "contracts" ? (
+          <ContractList
+            contracts={items as ClientContract[]}
+            clientId={clientId}
+            onUpdate={load}
+          />
         ) : (
-          <DocumentList items={items} showSignature={activeCategory === "contracts"} />
+          <DocumentList items={items} showSignature={false} />
         )}
       </div>
     </div>
+  );
+}
+
+/* ── Contract List (admin) ─────────────────────────────────── */
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function ContractList({
+  contracts,
+  clientId,
+  onUpdate,
+}: {
+  contracts: ClientContract[];
+  clientId: string;
+  onUpdate: () => void;
+}) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editUrl, setEditUrl] = useState("");
+  const [editStatus, setEditStatus] = useState<ClientContract["signatureStatus"]>("none");
+  const [saving, setSaving] = useState(false);
+
+  if (contracts.length === 0) {
+    return <p className={styles.empty}>No documents yet.</p>;
+  }
+
+  const startEdit = (contract: ClientContract) => {
+    setEditingId(contract.id);
+    setEditUrl(contract.signatureUrl ?? "");
+    setEditStatus(contract.signatureStatus);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditUrl("");
+    setEditStatus("none");
+  };
+
+  const saveEdit = async (docId: string) => {
+    setSaving(true);
+    try {
+      await updateContractSignature(
+        clientId,
+        docId,
+        editUrl.trim() || null,
+        editUrl.trim() ? editStatus : "none"
+      );
+      setEditingId(null);
+      onUpdate();
+    } catch (err) {
+      console.error("Failed to update signature:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      {contracts.map((contract) => (
+        <div key={contract.id} className={styles.docItem}>
+          <div className={styles.docInfo}>
+            <span className="text-body font-semibold">{contract.name}</span>
+            <span className="text-body-sm text-muted">
+              {contract.fileName} · {formatSize(contract.fileSizeBytes)} · Uploaded by {contract.uploadedBy}
+            </span>
+          </div>
+          <div className={styles.docActions}>
+            <Badge variant={SIGNATURE_VARIANT[contract.signatureStatus]}>
+              {contract.signatureStatus === "none"
+                ? "No signature"
+                : contract.signatureStatus.charAt(0).toUpperCase() + contract.signatureStatus.slice(1)}
+            </Badge>
+            <Button variant="ghost" size="sm" onClick={() => startEdit(contract)}>
+              Edit Signature
+            </Button>
+            <a
+              href={contract.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent text-body-sm"
+            >
+              Download
+            </a>
+          </div>
+          {editingId === contract.id && (
+            <div className={formStyles.form}>
+              <Input
+                label="Signing URL"
+                placeholder="https://app.dochub.com/..."
+                value={editUrl}
+                onChange={(e) => setEditUrl(e.target.value)}
+              />
+              <div className={formStyles.field}>
+                <label className={formStyles.label} htmlFor={`sig-status-${contract.id}`}>
+                  Signature Status
+                </label>
+                <select
+                  id={`sig-status-${contract.id}`}
+                  className={formStyles.select}
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value as ClientContract["signatureStatus"])}
+                >
+                  <option value="none">None</option>
+                  <option value="pending">Pending</option>
+                  <option value="signed">Signed</option>
+                </select>
+              </div>
+              <div className={formStyles.actions}>
+                <Button variant="secondary" size="sm" onClick={cancelEdit}>
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={() => saveEdit(contract.id)} disabled={saving}>
+                  {saving ? "Saving…" : "Save"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </>
   );
 }
 
