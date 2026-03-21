@@ -14,6 +14,8 @@ import DocumentList from "@/components/portal/DocumentList/DocumentList";
 import FileUpload from "@/components/portal/FileUpload/FileUpload";
 import MessageThread from "@/components/portal/MessageThread/MessageThread";
 import { Button, Badge, Card } from "@/components/ui";
+import { INVOICE_STATUS_VARIANT, INVOICE_STATUS_LABEL } from "@/lib/constants/invoiceStatus";
+import { formatCurrency } from "@/lib/utils/formatCurrency";
 import type {
   Client,
   ClientDocument,
@@ -32,15 +34,6 @@ const DOC_CATEGORIES: { key: DocumentCategory; label: string }[] = [
   { key: "assets", label: "Assets" },
   { key: "files", label: "Other Files" },
 ];
-
-const INVOICE_STATUS_VARIANT: Record<ClientInvoice["status"], "published" | "draft" | "featured" | "neutral"> = {
-  paid: "published",
-  sent: "featured",
-  pending: "draft",
-  draft: "neutral",
-  failed: "neutral",
-  refunded: "neutral",
-};
 
 export default function AdminClientViewPage() {
   const searchParams = useSearchParams();
@@ -192,13 +185,13 @@ function InvoicesTab({ clientId }: { clientId: string }) {
           <div className={styles.docInfo}>
             <span className="text-body font-semibold">{inv.description}</span>
             <span className="text-body-sm text-muted">
-              ${(inv.amountCents / 100).toFixed(2)} {inv.currency.toUpperCase()}
+              {formatCurrency(inv.amountCents, inv.currency)}
               {inv.dueDate?.toDate && ` · Due ${inv.dueDate.toDate().toLocaleDateString()}`}
             </span>
           </div>
           <div className={styles.docActions}>
             <Badge variant={INVOICE_STATUS_VARIANT[inv.status]}>
-              {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+              {INVOICE_STATUS_LABEL[inv.status]}
             </Badge>
             {inv.status !== "paid" && inv.status !== "refunded" && (
               <Button
