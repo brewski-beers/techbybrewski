@@ -9,7 +9,7 @@ import {
   getClientContracts,
   getClientInvoices,
 } from "@/lib/firestore/portalQueries";
-import { updateInvoiceStatus, updateContractSignature } from "@/lib/firestore/portalMutations";
+import { createInvoice, updateInvoiceStatus, updateContractSignature } from "@/lib/firestore/portalMutations";
 import DocumentList from "@/components/portal/DocumentList/DocumentList";
 import FileUpload from "@/components/portal/FileUpload/FileUpload";
 import MessageThread from "@/components/portal/MessageThread/MessageThread";
@@ -33,6 +33,10 @@ const DOC_CATEGORIES: { key: DocumentCategory; label: string }[] = [
   { key: "deliverables", label: "Deliverables" },
   { key: "assets", label: "Assets" },
   { key: "files", label: "Other Files" },
+];
+
+const INVOICE_STATUSES: ClientInvoice["status"][] = [
+  "draft", "sent", "pending", "paid", "failed", "refunded",
 ];
 
 const SIGNATURE_VARIANT: Record<ClientContract["signatureStatus"], "published" | "draft" | "neutral"> = {
@@ -112,7 +116,7 @@ export default function AdminClientViewPage() {
   );
 }
 
-/* ── Documents Tab ─────────────────────────────────────────── */
+/* ── Documents Tab ──────────────────────────────────────────────── */
 
 function DocumentsTab({ clientId }: { clientId: string }) {
   const [activeCategory, setActiveCategory] = useState<DocumentCategory>("contracts");
@@ -278,7 +282,7 @@ function ContractList({
                   Cancel
                 </Button>
                 <Button size="sm" onClick={() => saveEdit(contract.id)} disabled={saving}>
-                  {saving ? "Saving…" : "Save"}
+                  {saving ? "Saving..." : "Save"}
                 </Button>
               </div>
             </div>
@@ -289,11 +293,23 @@ function ContractList({
   );
 }
 
-/* ── Invoices Tab ──────────────────────────────────────────── */
+/* ── Invoices Tab ────────────────────────────────────────────────── */
+
+const EMPTY_FORM = {
+  type: "one-time" as ClientInvoice["type"],
+  amount: "",
+  currency: "USD",
+  description: "",
+  dueDate: "",
+};
 
 function InvoicesTab({ clientId }: { clientId: string }) {
   const [items, setItems] = useState<ClientInvoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -310,36 +326,163 @@ function InvoicesTab({ clientId }: { clientId: string }) {
     load();
   };
 
-  if (loading) return <div className={styles.empty}>Loading…</div>;
-  if (items.length === 0) return <p className={styles.empty}>No invoices yet.</p>;
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError(null);
+
+    const parsedAmount = parseFloat(form.amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      setFormError("Amount must be a positive number.");
+      return;
+    }
+    if (!form.description.trim()) {
+      setFormError("Description is required.");
+      return;
+    }
+
+    const amountCents = Math.round(parsedAmount * 100);
+    const dueDate = form.dueDate ? new Date(form.dueDate) : null;
+
+    setSubmitting(true);
+    try {
+      await createInvoice(clientId, {
+        type: form.type,
+        amountCents,
+        currency: form.currency.trim() || "USD",
+        description: form.description.trim(),
+        dueDate,
+      });
+      setForm(EMPTY_FORM);
+      setShowForm(false);
+      load();
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Failed to create invoice.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className={styles.docList}>
-      {items.map((inv) => (
-        <div key={inv.id} className={styles.docItem}>
-          <div className={styles.docInfo}>
-            <span className="text-body font-semibold">{inv.description}</span>
-            <span className="text-body-sm text-muted">
-              {formatCurrency(inv.amountCents, inv.currency)}
-              {inv.dueDate?.toDate && ` · Due ${inv.dueDate.toDate().toLocaleDateString()}`}
-            </span>
-          </div>
-          <div className={styles.docActions}>
-            <Badge variant={INVOICE_STATUS_VARIANT[inv.status]}>
-              {INVOICE_STATUS_LABEL[inv.status]}
-            </Badge>
-            {inv.status !== "paid" && inv.status !== "refunded" && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleStatusChange(inv.id, "paid")}
+    <div>
+      <div className={formStyles.actions}>
+        <Button variant="primary" size="sm" onClick={() => setShowForm((v) => !v)}>
+          {showForm ? "Cancel" : "New Invoice"}
+        </Button>
+      </div>
+
+      {showForm && (
+        <Card>
+          <form onSubmit={handleCreate} className={formStyles.form}>
+            <div className={formStyles.field}>
+              <label htmlFor="inv-type" className={formStyles.label}>Type</label>
+              <select
+                id="inv-type"
+                className={formStyles.select}
+                value={form.type}
+                onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as ClientInvoice["type"] }))}
               >
-                Mark Paid
+                <option value="one-time">One-time</option>
+                <option value="recurring">Recurring</option>
+              </select>
+            </div>
+
+            <div className={formStyles.field}>
+              <label htmlFor="inv-description" className={formStyles.label}>Description</label>
+              <input
+                id="inv-description"
+                type="text"
+                placeholder="e.g. Website redesign — Phase 1"
+                className={formStyles.select}
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              />
+            </div>
+
+            <div className={formStyles.twoCol}>
+              <div className={formStyles.field}>
+                <label htmlFor="inv-amount" className={formStyles.label}>Amount</label>
+                <input
+                  id="inv-amount"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="150.00"
+                  className={formStyles.select}
+                  value={form.amount}
+                  onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
+                />
+              </div>
+
+              <div className={formStyles.field}>
+                <label htmlFor="inv-currency" className={formStyles.label}>Currency</label>
+                <select
+                  id="inv-currency"
+                  className={formStyles.select}
+                  value={form.currency}
+                  onChange={(e) => setForm((f) => ({ ...f, currency: e.target.value }))}
+                >
+                  <option value="USD">USD</option>
+                  <option value="CAD">CAD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+              </div>
+            </div>
+
+            <div className={formStyles.field}>
+              <label htmlFor="inv-due" className={formStyles.label}>Due Date (optional)</label>
+              <input
+                id="inv-due"
+                type="date"
+                className={formStyles.select}
+                value={form.dueDate}
+                onChange={(e) => setForm((f) => ({ ...f, dueDate: e.target.value }))}
+              />
+            </div>
+
+            {formError && <p className={formStyles.errorMsg}>{formError}</p>}
+
+            <div className={formStyles.actions}>
+              <Button type="submit" variant="primary" loading={submitting}>
+                Create Invoice
               </Button>
-            )}
-          </div>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      {loading ? (
+        <div className={styles.empty}>Loading…</div>
+      ) : items.length === 0 ? (
+        <p className={styles.empty}>No invoices yet.</p>
+      ) : (
+        <div className={styles.docList}>
+          {items.map((inv) => (
+            <div key={inv.id} className={styles.docItem}>
+              <div className={styles.docInfo}>
+                <span className="text-body font-semibold">{inv.description}</span>
+                <span className="text-body-sm text-muted">
+                  {formatCurrency(inv.amountCents, inv.currency)}
+                  {inv.dueDate?.toDate && ` · Due ${inv.dueDate.toDate().toLocaleDateString()}`}
+                </span>
+              </div>
+              <div className={styles.docActions}>
+                <Badge variant={INVOICE_STATUS_VARIANT[inv.status]}>
+                  {INVOICE_STATUS_LABEL[inv.status]}
+                </Badge>
+                <select
+                  className={formStyles.select}
+                  value={inv.status}
+                  onChange={(e) => handleStatusChange(inv.id, e.target.value as ClientInvoice["status"])}
+                  aria-label={`Change status for ${inv.description}`}
+                >
+                  {INVOICE_STATUSES.map((s) => (
+                    <option key={s} value={s}>{INVOICE_STATUS_LABEL[s]}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
