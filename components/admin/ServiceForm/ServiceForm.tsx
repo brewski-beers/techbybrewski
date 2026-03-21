@@ -7,7 +7,7 @@ import { storage } from "@/lib/firebase";
 import { Service, ServiceFormData } from "@/lib/types";
 import { createService, updateService, publishService, unpublishService, deleteService } from "@/lib/firestore/mutations";
 import { getAllServices } from "@/lib/firestore/queries";
-import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminArrayField, AdminCard } from "@/components/admin/ui";
+import { Button, Input, Textarea, Toggle, ArrayField, Card } from "@/components/ui";
 import { slugify } from "@/lib/utils";
 import styles from "./ServiceForm.module.css";
 
@@ -113,27 +113,27 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <AdminCard>
+      <Card>
         <h2 className={`text-h4 ${styles.cardTitle}`}>Details</h2>
-        <AdminInput
+        <Input
           label="Name" value={form.name} required
           onChange={(e) => {
             set("name", e.target.value);
             if (!existing) set("slug", slugify(e.target.value));
           }}
         />
-        <AdminInput
+        <Input
           label="Slug" value={form.slug} required
           hint="URL path: /services/slug"
           onChange={(e) => set("slug", slugify(e.target.value))}
         />
-        <AdminTextarea
+        <Textarea
           label="Summary" value={form.summary} rows={3} required
           onChange={(e) => set("summary", e.target.value)}
         />
-      </AdminCard>
+      </Card>
 
-      <AdminCard>
+      <Card>
         <h2 className={`text-h4 ${styles.cardTitle}`}>Feature Image</h2>
         {form.imageUrl && (
           <div className={styles.imagePreview}>
@@ -145,44 +145,44 @@ export default function ServiceForm({ existing }: ServiceFormProps) {
           </div>
         )}
         <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} className={styles.fileInput} />
-        <AdminButton type="button" variant="secondary" loading={isUploading} onClick={() => fileRef.current?.click()}>
+        <Button type="button" variant="secondary" loading={isUploading} onClick={() => fileRef.current?.click()}>
           {isUploading ? "Uploading..." : form.imageUrl ? "Replace Image" : "Upload Image"}
-        </AdminButton>
-      </AdminCard>
+        </Button>
+      </Card>
 
-      <AdminCard>
+      <Card>
         <h2 className={`text-h4 ${styles.cardTitle}`}>Content</h2>
-        <AdminArrayField label="Bullets" hint="Key selling points" values={form.bullets} onChange={(v) => set("bullets", v)} placeholder="Add a bullet point..." />
-        <AdminArrayField label="Use Cases" hint="Who is this for?" values={form.useCases} onChange={(v) => set("useCases", v)} placeholder="Add a use case..." />
-      </AdminCard>
+        <ArrayField label="Bullets" hint="Key selling points" values={form.bullets} onChange={(v) => set("bullets", v)} placeholder="Add a bullet point..." />
+        <ArrayField label="Use Cases" hint="Who is this for?" values={form.useCases} onChange={(v) => set("useCases", v)} placeholder="Add a use case..." />
+      </Card>
 
-      <AdminCard>
+      <Card>
         <h2 className={`text-h4 ${styles.cardTitle}`}>Visibility</h2>
-        <AdminToggle label="Active" hint="Show in services listing" checked={form.isActive} onChange={(v) => set("isActive", v)} />
+        <Toggle label="Active" hint="Show in services listing" checked={form.isActive} onChange={(v) => set("isActive", v)} />
         {existing && (
-          <AdminToggle
+          <Toggle
             label="Published"
             hint="Visible on public site"
             checked={form.isPublished}
             onChange={handlePublishToggle}
           />
         )}
-      </AdminCard>
+      </Card>
 
       {error && <p className={styles.errorMsg}>{error}</p>}
 
       <div className={styles.actions}>
         {existing && (
-          <AdminButton type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>
+          <Button type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>
             Delete
-          </AdminButton>
+          </Button>
         )}
-        <AdminButton type="button" variant="secondary" onClick={() => router.push("/admin/services")}>
+        <Button type="button" variant="secondary" onClick={() => router.push("/admin/services")}>
           Cancel
-        </AdminButton>
-        <AdminButton type="submit" loading={isSaving}>
+        </Button>
+        <Button type="submit" loading={isSaving}>
           {existing ? "Save Changes" : "Create Service"}
-        </AdminButton>
+        </Button>
       </div>
     </form>
   );

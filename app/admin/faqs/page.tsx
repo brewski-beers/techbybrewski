@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getAllFAQs } from "@/lib/firestore/queries";
 import { reorderFAQs } from "@/lib/firestore/mutations";
 import { FAQ } from "@/lib/types";
-import { AdminButton, AdminBadge, AdminCard } from "@/components/admin/ui";
+import { Button, Badge, Card } from "@/components/ui";
 import { SortableList, DragHandle } from "@/components/admin/SortableList";
 import styles from "@/styles/adminList.module.css";
 
@@ -34,7 +34,7 @@ export default function AdminFAQsPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div><h1 className="text-h2">FAQs</h1><p className="text-body text-muted">{items.length} total</p></div>
-        <Link href="/admin/faqs/new"><AdminButton>+ New FAQ</AdminButton></Link>
+        <Link href="/admin/faqs/new"><Button>+ New FAQ</Button></Link>
       </div>
 
       {reorderError && <p className={styles.errorMsg}>{reorderError}</p>}
@@ -42,7 +42,7 @@ export default function AdminFAQsPage() {
       {loading ? (
         <div className={styles.list}>{[1, 2].map(n => <div key={n} className={`skeleton ${styles.skeleton}`} />)}</div>
       ) : items.length === 0 ? (
-        <AdminCard><p className="text-body text-muted">No FAQs yet. <Link href="/admin/faqs/new" className="text-accent">Add one →</Link></p></AdminCard>
+        <Card><p className="text-body text-muted">No FAQs yet. <Link href="/admin/faqs/new" className="text-accent">Add one →</Link></p></Card>
       ) : (
         <div className={`${styles.list} ${isPending ? styles.listPending : ""}`}>
           <SortableList items={optimisticItems} onReorder={handleReorder}>
@@ -53,7 +53,7 @@ export default function AdminFAQsPage() {
                   <span className="text-body font-semibold">{f.question}</span>
                   {f.category && <span className="text-body-sm text-muted">{f.category}</span>}
                 </Link>
-                <AdminBadge variant={f.isPublished ? "published" : "draft"}>{f.isPublished ? "Published" : "Draft"}</AdminBadge>
+                <Badge variant={f.isPublished ? "published" : "draft"}>{f.isPublished ? "Published" : "Draft"}</Badge>
               </div>
             )}
           </SortableList>

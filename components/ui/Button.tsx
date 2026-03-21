@@ -1,15 +1,15 @@
-import styles from "./AdminButton.module.css";
+import styles from "./Button.module.css";
 
 type Variant = "primary" | "secondary" | "danger" | "ghost";
 type Size = "sm" | "md" | "lg";
 
-interface AdminButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
   loading?: boolean;
 }
 
-export default function AdminButton({
+export default function Button({
   variant = "primary",
   size = "md",
   loading = false,
@@ -17,7 +17,7 @@ export default function AdminButton({
   children,
   className = "",
   ...props
-}: AdminButtonProps) {
+}: ButtonProps) {
   return (
     <button
       {...props}
