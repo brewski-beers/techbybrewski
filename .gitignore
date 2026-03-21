@@ -38,4 +38,5 @@ next-env.d.ts
 
 # seed script credentials - NEVER COMMIT
 scripts/service-account.json
+/service-account.json
 firebase-debug.log

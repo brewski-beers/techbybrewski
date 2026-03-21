@@ -171,3 +171,11 @@ export async function reorderServices(items: { id: string; order: number }[]): P
 export async function reorderFAQs(items: { id: string; order: number }[]): Promise<void> {
   await reorderCollection("faqs", items);
 }
+
+export async function reorderTestimonials(items: { id: string; order: number }[]): Promise<void> {
+  await reorderCollection("testimonials", items);
+}
+
+export async function reorderCaseStudies(items: { id: string; order: number }[]): Promise<void> {
+  await reorderCollection("caseStudies", items);
+}
