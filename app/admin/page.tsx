@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getDashboardStats, getRecentActivity, DashboardStats } from "@/lib/firestore/queries";
 import { ActivityLogEntry } from "@/lib/types";
-import AdminCard from "@/components/admin/ui/AdminCard";
-import AdminBadge from "@/components/admin/ui/AdminBadge";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
 import styles from "./page.module.css";
 
 export default function AdminDashboard() {
@@ -53,16 +53,16 @@ export default function AdminDashboard() {
         ) : (
           <div className={styles.statsGrid}>
             {stats && Object.entries(stats).map(([col, counts]) => (
-              <AdminCard key={col} className={styles.statCard}>
+              <Card key={col} className={styles.statCard}>
                 <p className={`text-label ${styles.statLabel}`}>{col}</p>
                 <div className={styles.statCounts}>
-                  <AdminBadge variant="published">{counts.published} published</AdminBadge>
-                  <AdminBadge variant="draft">{counts.draft} draft</AdminBadge>
+                  <Badge variant="published">{counts.published} published</Badge>
+                  <Badge variant="draft">{counts.draft} draft</Badge>
                 </div>
                 <Link href={`/admin/${col}`} className={styles.statLink}>
                   Manage →
                 </Link>
-              </AdminCard>
+              </Card>
             ))}
           </div>
         )}
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
       {/* Recent Activity */}
       <section>
         <h2 className={`text-label text-muted ${styles.sectionLabel}`}>Recent Activity</h2>
-        <AdminCard>
+        <Card>
           {loading ? (
             <div className={styles.activityList}>
               {[1,2,3].map((n) => <div key={n} className={`skeleton ${styles.activitySkeleton}`} />)}
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
             <ul className={styles.activityList}>
               {activity.map((entry) => (
                 <li key={entry.id} className={styles.activityItem}>
-                  <AdminBadge variant="neutral">{entry.action}</AdminBadge>
+                  <Badge variant="neutral">{entry.action}</Badge>
                   <span className="text-body-sm">{entry.changesSummary}</span>
                   <span className="text-caption text-muted">
                     {entry.timestamp?.toDate?.()?.toLocaleDateString()}
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
               ))}
             </ul>
           )}
-        </AdminCard>
+        </Card>
       </section>
     </div>
   );

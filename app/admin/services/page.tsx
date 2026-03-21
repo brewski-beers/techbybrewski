@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getAllServices } from "@/lib/firestore/queries";
 import { reorderServices } from "@/lib/firestore/mutations";
 import { Service } from "@/lib/types";
-import { AdminButton, AdminBadge, AdminCard } from "@/components/admin/ui";
+import { Button, Badge, Card } from "@/components/ui";
 import { SortableList, DragHandle } from "@/components/admin/SortableList";
 import styles from "@/styles/adminList.module.css";
 
@@ -41,7 +41,7 @@ export default function AdminServicesPage() {
           <p className="text-body text-muted">{services.length} total</p>
         </div>
         <Link href="/admin/services/new">
-          <AdminButton>+ New Service</AdminButton>
+          <Button>+ New Service</Button>
         </Link>
       </div>
 
@@ -50,7 +50,7 @@ export default function AdminServicesPage() {
       {loading ? (
         <div className={styles.list}>{[1, 2, 3].map((n) => <div key={n} className={`skeleton ${styles.skeleton}`} />)}</div>
       ) : services.length === 0 ? (
-        <AdminCard><p className="text-body text-muted">No services yet. <Link href="/admin/services/new" className="text-accent">Create one →</Link></p></AdminCard>
+        <Card><p className="text-body text-muted">No services yet. <Link href="/admin/services/new" className="text-accent">Create one →</Link></p></Card>
       ) : (
         <div className={`${styles.list} ${isPending ? styles.listPending : ""}`}>
           <SortableList items={optimisticServices} onReorder={handleReorder}>
@@ -62,9 +62,9 @@ export default function AdminServicesPage() {
                   <span className="text-body-sm text-muted">/services/{s.slug}</span>
                 </Link>
                 <div className={styles.itemMeta}>
-                  <AdminBadge variant={s.isPublished ? "published" : "draft"}>
+                  <Badge variant={s.isPublished ? "published" : "draft"}>
                     {s.isPublished ? "Published" : "Draft"}
-                  </AdminBadge>
+                  </Badge>
                 </div>
               </div>
             )}

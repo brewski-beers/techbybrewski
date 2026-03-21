@@ -1,14 +1,14 @@
 "use client";
-import styles from "./AdminToggle.module.css";
+import styles from "./Toggle.module.css";
 
-interface AdminToggleProps {
+interface ToggleProps {
   label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
   hint?: string;
 }
 
-export default function AdminToggle({ label, checked, onChange, hint }: AdminToggleProps) {
+export default function Toggle({ label, checked, onChange, hint }: ToggleProps) {
   return (
     <label className={styles.wrapper}>
       <div className={styles.labelGroup}>

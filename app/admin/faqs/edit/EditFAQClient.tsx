@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { getFAQById } from "@/lib/firestore/queries";
 import { updateFAQ, deleteFAQ } from "@/lib/firestore/mutations";
 import { FAQ, FAQFormData } from "@/lib/types";
-import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminCard } from "@/components/admin/ui";
+import { Button, Input, Textarea, Toggle, Card } from "@/components/ui";
 import styles from "@/styles/adminForm.module.css";
 
 export default function EditFAQClient() {
@@ -56,20 +56,20 @@ export default function EditFAQClient() {
     <div className={styles.page}>
       <h1 className="text-h2">Edit FAQ</h1>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <AdminCard>
+        <Card>
           <h2 className={`text-h4 ${styles.cardTitle}`}>Content</h2>
-          <AdminInput label="Question" value={form.question} required onChange={e => set("question", e.target.value)} />
-          <AdminTextarea label="Answer" value={form.answer} rows={4} required onChange={e => set("answer", e.target.value)} />
-          <AdminInput label="Category" value={form.category} onChange={e => set("category", e.target.value)} />
-          <AdminToggle label="Published" checked={form.isPublished} onChange={v => set("isPublished", v)} />
-        </AdminCard>
+          <Input label="Question" value={form.question} required onChange={e => set("question", e.target.value)} />
+          <Textarea label="Answer" value={form.answer} rows={4} required onChange={e => set("answer", e.target.value)} />
+          <Input label="Category" value={form.category} onChange={e => set("category", e.target.value)} />
+          <Toggle label="Published" checked={form.isPublished} onChange={v => set("isPublished", v)} />
+        </Card>
 
         {error && <p className={styles.errorMsg}>{error}</p>}
 
         <div className={styles.actions}>
-          <AdminButton type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>Delete</AdminButton>
-          <AdminButton type="button" variant="secondary" onClick={() => router.push("/admin/faqs")}>Cancel</AdminButton>
-          <AdminButton type="submit" loading={isSaving}>Save</AdminButton>
+          <Button type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>Delete</Button>
+          <Button type="button" variant="secondary" onClick={() => router.push("/admin/faqs")}>Cancel</Button>
+          <Button type="submit" loading={isSaving}>Save</Button>
         </div>
       </form>
     </div>
