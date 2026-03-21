@@ -5,15 +5,17 @@ service cloud.firestore {
 
     // Helper: check if the requesting user is an admin
     function isAdmin() {
-      return request.auth != null
-        && exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+      return request.auth != null && request.auth.token.admin == true;
     }
 
-    // ---- Admin Users ----
-    // Only admins can read; nobody can write via client (managed via Firebase Console or admin SDK)
-    match /adminUsers/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;
+    // Helper: check if the requesting user is a client
+    function isClient() {
+      return request.auth != null && request.auth.token.client == true;
+    }
+
+    // Helper: check if the requesting user is the owner or an admin
+    function isOwnerOrAdmin(clientId) {
+      return isAdmin() || (isClient() && request.auth.uid == clientId);
     }
 
     // ---- Site Settings ----
@@ -59,6 +61,42 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create: if isAdmin();
       allow update, delete: if false;
+    }
+
+    // ---- Clients (portal) ----
+    match /clients/{clientId} {
+      allow read, write: if isAdmin();
+      allow read: if isClient() && request.auth.uid == clientId;
+    }
+
+    match /clients/{clientId}/contracts/{docId} {
+      allow read, write: if isAdmin();
+      allow read, create: if isOwnerOrAdmin(clientId);
+    }
+
+    match /clients/{clientId}/deliverables/{docId} {
+      allow read, write: if isAdmin();
+      allow read, create: if isOwnerOrAdmin(clientId);
+    }
+
+    match /clients/{clientId}/assets/{docId} {
+      allow read, write: if isAdmin();
+      allow read, create: if isOwnerOrAdmin(clientId);
+    }
+
+    match /clients/{clientId}/files/{docId} {
+      allow read, write: if isAdmin();
+      allow read, create: if isOwnerOrAdmin(clientId);
+    }
+
+    match /clients/{clientId}/messages/{msgId} {
+      allow read, write: if isAdmin();
+      allow read, create: if isOwnerOrAdmin(clientId);
+    }
+
+    match /clients/{clientId}/invoices/{invId} {
+      allow read, write: if isAdmin();
+      allow read: if isOwnerOrAdmin(clientId);
     }
 
     // ---- Deny everything else ----

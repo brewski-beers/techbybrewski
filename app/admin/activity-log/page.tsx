@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { getRecentActivity } from "@/lib/firestore/queries";
 import { ActivityLogEntry } from "@/lib/types";
-import { AdminCard, AdminBadge } from "@/components/admin/ui";
+import { Card, Badge } from "@/components/ui";
 import styles from "./page.module.css";
 
 export default function ActivityLogPage() {
@@ -16,7 +16,7 @@ export default function ActivityLogPage() {
         <h1 className="text-h2">Activity Log</h1>
         <p className="text-body text-muted">Last 50 admin actions.</p>
       </div>
-      <AdminCard>
+      <Card>
         {loading ? (
           <div className={styles.list}>{[1,2,3,4,5].map(n => <div key={n} className={`skeleton ${styles.skeleton}`} />)}</div>
         ) : entries.length === 0 ? (
@@ -26,7 +26,7 @@ export default function ActivityLogPage() {
             {entries.map(e => (
               <li key={e.id} className={styles.entry}>
                 <div className={styles.entryMain}>
-                  <AdminBadge variant="neutral">{e.action}</AdminBadge>
+                  <Badge variant="neutral">{e.action}</Badge>
                   <span className="text-body-sm">{e.changesSummary}</span>
                 </div>
                 <div className={styles.entryMeta}>
@@ -39,7 +39,7 @@ export default function ActivityLogPage() {
             ))}
           </ul>
         )}
-      </AdminCard>
+      </Card>
     </div>
   );
 }

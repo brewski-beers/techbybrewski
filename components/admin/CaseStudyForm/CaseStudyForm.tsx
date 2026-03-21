@@ -6,7 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from "@/lib/storage";
 import { storage } from "@/lib/firebase";
 import { CaseStudy, CaseStudyFormData } from "@/lib/types";
 import { createCaseStudy, updateCaseStudy, publishCaseStudy, unpublishCaseStudy, deleteCaseStudy } from "@/lib/firestore/mutations";
-import { AdminButton, AdminInput, AdminTextarea, AdminToggle, AdminArrayField, AdminCard } from "@/components/admin/ui";
+import { Button, Input, Textarea, Toggle, ArrayField, Card } from "@/components/ui";
 import { slugify } from "@/lib/utils";
 import styles from "./CaseStudyForm.module.css";
 
@@ -105,25 +105,25 @@ export default function CaseStudyForm({ existing }: { existing?: CaseStudy }) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <AdminCard>
+      <Card>
         <h2 className={`text-h4 ${styles.cardTitle}`}>Details</h2>
-        <AdminInput label="Title" value={form.title} required onChange={(e) => { set("title", e.target.value); if (!existing) set("slug", slugify(e.target.value)); }} />
-        <AdminInput label="Slug" value={form.slug} required hint="URL: /case-studies/slug" onChange={(e) => set("slug", slugify(e.target.value))} />
-        <AdminInput label="Client Name" value={form.clientName} hint="Use 'Confidential' to anonymize" onChange={(e) => set("clientName", e.target.value)} />
-        <AdminInput label="Industry" value={form.industry} onChange={(e) => set("industry", e.target.value)} />
-        <AdminInput label="Display Order" type="number" value={form.order} onChange={(e) => set("order", Number(e.target.value))} />
-      </AdminCard>
+        <Input label="Title" value={form.title} required onChange={(e) => { set("title", e.target.value); if (!existing) set("slug", slugify(e.target.value)); }} />
+        <Input label="Slug" value={form.slug} required hint="URL: /case-studies/slug" onChange={(e) => set("slug", slugify(e.target.value))} />
+        <Input label="Client Name" value={form.clientName} hint="Use 'Confidential' to anonymize" onChange={(e) => set("clientName", e.target.value)} />
+        <Input label="Industry" value={form.industry} onChange={(e) => set("industry", e.target.value)} />
+        <Input label="Display Order" type="number" value={form.order} onChange={(e) => set("order", Number(e.target.value))} />
+      </Card>
 
-      <AdminCard>
+      <Card>
         <h2 className={`text-h4 ${styles.cardTitle}`}>Content</h2>
-        <AdminTextarea label="Overview" value={form.overview} rows={4} required onChange={(e) => set("overview", e.target.value)} />
-        <AdminArrayField label="Problem" hint="What challenges did the client face?" values={form.problem} onChange={(v) => set("problem", v)} placeholder="Add a problem statement..." />
-        <AdminArrayField label="Solution" hint="How did you solve it?" values={form.solution} onChange={(v) => set("solution", v)} placeholder="Add a solution point..." />
-        <AdminArrayField label="Outcomes" hint="Measurable results" values={form.outcomes} onChange={(v) => set("outcomes", v)} placeholder="Add an outcome..." />
-        <AdminArrayField label="Tech Stack" values={form.stack} onChange={(v) => set("stack", v)} placeholder="React, Firebase, etc." />
-      </AdminCard>
+        <Textarea label="Overview" value={form.overview} rows={4} required onChange={(e) => set("overview", e.target.value)} />
+        <ArrayField label="Problem" hint="What challenges did the client face?" values={form.problem} onChange={(v) => set("problem", v)} placeholder="Add a problem statement..." />
+        <ArrayField label="Solution" hint="How did you solve it?" values={form.solution} onChange={(v) => set("solution", v)} placeholder="Add a solution point..." />
+        <ArrayField label="Outcomes" hint="Measurable results" values={form.outcomes} onChange={(v) => set("outcomes", v)} placeholder="Add an outcome..." />
+        <ArrayField label="Tech Stack" values={form.stack} onChange={(v) => set("stack", v)} placeholder="React, Firebase, etc." />
+      </Card>
 
-      <AdminCard>
+      <Card>
         <h2 className={`text-h4 ${styles.cardTitle}`}>Images</h2>
         {form.images.length > 0 && (
           <div className={styles.imageGrid}>
@@ -143,23 +143,23 @@ export default function CaseStudyForm({ existing }: { existing?: CaseStudy }) {
           </div>
         )}
         <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} className={styles.fileInput} />
-        <AdminButton type="button" variant="secondary" loading={isUploading} onClick={() => fileRef.current?.click()}>
+        <Button type="button" variant="secondary" loading={isUploading} onClick={() => fileRef.current?.click()}>
           {isUploading ? "Uploading..." : "Upload Image"}
-        </AdminButton>
-      </AdminCard>
+        </Button>
+      </Card>
 
-      <AdminCard>
+      <Card>
         <h2 className={`text-h4 ${styles.cardTitle}`}>Visibility</h2>
-        <AdminToggle label="Featured" hint="Show on homepage featured section" checked={form.featured} onChange={(v) => set("featured", v)} />
-        {existing && <AdminToggle label="Published" hint="Visible on public site" checked={form.isPublished} onChange={handlePublishToggle} />}
-      </AdminCard>
+        <Toggle label="Featured" hint="Show on homepage featured section" checked={form.featured} onChange={(v) => set("featured", v)} />
+        {existing && <Toggle label="Published" hint="Visible on public site" checked={form.isPublished} onChange={handlePublishToggle} />}
+      </Card>
 
       {error && <p className={styles.errorMsg}>{error}</p>}
 
       <div className={styles.actions}>
-        {existing && <AdminButton type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>Delete</AdminButton>}
-        <AdminButton type="button" variant="secondary" onClick={() => router.push("/admin/case-studies")}>Cancel</AdminButton>
-        <AdminButton type="submit" loading={isSaving}>{existing ? "Save Changes" : "Create Case Study"}</AdminButton>
+        {existing && <Button type="button" variant="danger" loading={isDeleting} onClick={handleDelete}>Delete</Button>}
+        <Button type="button" variant="secondary" onClick={() => router.push("/admin/case-studies")}>Cancel</Button>
+        <Button type="submit" loading={isSaving}>{existing ? "Save Changes" : "Create Case Study"}</Button>
       </div>
     </form>
   );

@@ -1,19 +1,19 @@
-import styles from "./AdminTextarea.module.css";
+import styles from "./Textarea.module.css";
 
-interface AdminTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   error?: string;
   hint?: string;
 }
 
-export default function AdminTextarea({
+export default function Textarea({
   label,
   error,
   hint,
   id,
   className = "",
   ...props
-}: AdminTextareaProps) {
+}: TextareaProps) {
   const inputId = id ?? label.toLowerCase().replace(/\s+/g, "-");
   return (
     <div className={`${styles.field} ${className}`}>

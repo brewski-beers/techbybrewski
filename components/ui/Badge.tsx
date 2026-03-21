@@ -1,13 +1,13 @@
-import styles from "./AdminBadge.module.css";
+import styles from "./Badge.module.css";
 
 type BadgeVariant = "published" | "draft" | "featured" | "neutral";
 
-interface AdminBadgeProps {
+interface BadgeProps {
   variant?: BadgeVariant;
   children: React.ReactNode;
 }
 
-export default function AdminBadge({ variant = "neutral", children }: AdminBadgeProps) {
+export default function Badge({ variant = "neutral", children }: BadgeProps) {
   return (
     <span className={`${styles.badge} ${styles[variant]}`}>{children}</span>
   );

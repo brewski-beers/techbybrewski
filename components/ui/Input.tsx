@@ -1,19 +1,19 @@
-import styles from "./AdminInput.module.css";
+import styles from "./Input.module.css";
 
-interface AdminInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
   hint?: string;
 }
 
-export default function AdminInput({
+export default function Input({
   label,
   error,
   hint,
   id,
   className = "",
   ...props
-}: AdminInputProps) {
+}: InputProps) {
   const inputId = id ?? label.toLowerCase().replace(/\s+/g, "-");
   return (
     <div className={`${styles.field} ${className}`}>

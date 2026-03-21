@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import styles from "./AdminArrayField.module.css";
+import styles from "./ArrayField.module.css";
 
-interface AdminArrayFieldProps {
+interface ArrayFieldProps {
   label: string;
   hint?: string;
   values: string[];
@@ -10,13 +10,13 @@ interface AdminArrayFieldProps {
   placeholder?: string;
 }
 
-export default function AdminArrayField({
+export default function ArrayField({
   label,
   hint,
   values,
   onChange,
   placeholder = "Add item...",
-}: AdminArrayFieldProps) {
+}: ArrayFieldProps) {
   const [draft, setDraft] = useState("");
 
   const add = () => {

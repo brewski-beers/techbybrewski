@@ -9,6 +9,7 @@ import styles from "./AdminShell.module.css";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/admin" },
+  { label: "Clients", href: "/admin/clients" },
   { label: "Site Settings", href: "/admin/settings" },
   { label: "Services", href: "/admin/services" },
   { label: "Case Studies", href: "/admin/case-studies" },

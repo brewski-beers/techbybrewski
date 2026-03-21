@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
 import AdminLogin from "@/components/admin/AdminLogin/AdminLogin";
 import AdminShell from "@/components/admin/AdminShell/AdminShell";
 import styles from "./AdminAuthProvider.module.css";
@@ -28,14 +27,12 @@ export default function AdminAuthProvider({
       }
 
       try {
-        const adminDoc = await getDoc(doc(db, "adminUsers", currentUser.uid));
+        const tokenResult = await currentUser.getIdTokenResult(true);
         setUser(currentUser);
-        setAuthorized(adminDoc.exists());
+        setAuthorized(tokenResult.claims.admin === true);
       } catch (err) {
         console.error("Admin auth check failed:", err);
-        setError(
-          "Firestore rules may not be deployed yet. See console for details."
-        );
+        setError("Could not verify admin access. See console for details.");
         setAuthorized(false);
       } finally {
         setLoading(false);

@@ -1,0 +1,65 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  color: var(--color-text);
+}
+
+.company {
+  color: var(--color-text-muted);
+}
+
+/* --- Card grid --- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  position: relative;
+}
+
+.card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardLabel {
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.cardDescription {
+  color: var(--color-text-muted);
+  flex: 1;
+}
+
+.cardArrow {
+  font-size: var(--text-base);
+  color: var(--color-accent);
+  margin-top: var(--space-2);
+}
