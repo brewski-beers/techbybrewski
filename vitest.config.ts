@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
-    include: ["src/**/*.test.ts", "**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}", "**/*.test.{ts,tsx}"],
     exclude: ["node_modules", "firestore/__tests__/**"],
     setupFiles: ["@testing-library/jest-dom"],
     globals: true,
