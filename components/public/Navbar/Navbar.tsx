@@ -14,6 +14,7 @@ const STATIC_LINKS = [
   { label: "Work", href: "/case-studies" },
   { label: "Process", href: "/process" },
   { label: "About", href: "/about" },
+  { label: "Client Portal", href: "/portal" },
 ];
 
 export default function Navbar({ services = [] }: { services?: NavService[] }) {

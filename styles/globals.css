@@ -18,6 +18,7 @@
   --color-surface-raised: #f5f5f4;
   --color-border: #e7e5e4;
   --color-border-strong: #d6d3d1;
+  --color-surface-warm: #fdf8f0;
 
   /* --- Text --- */
   --color-text: #18181b;
@@ -29,6 +30,8 @@
   /* --- Dark surfaces --- */
   --color-surface-dark: #0f172a;
   --color-surface-dark-raised: #1e293b;
+
+  /* --- Neutrals --- */
   --color-slate-700: #334155;
 
   /* --- Status --- */
@@ -111,7 +114,6 @@
   --shadow-accent: 0 4px 14px rgba(79, 70, 229, 0.25);
   --shadow-accent-lg: 0 6px 20px rgba(79, 70, 229, 0.35);
   --shadow-accent-xl: 0 4px 14px rgba(79, 70, 229, 0.3);
-  --color-surface-warm: #fdf8f0;
   --shadow-warm-sm: 0 1px 3px 0 rgb(120 80 40 / 0.06), 0 1px 2px -1px rgb(120 80 40 / 0.04);
 
   /* --- Transitions --- */
