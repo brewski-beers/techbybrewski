@@ -8,6 +8,7 @@ import "@/styles/animations.css";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--inter",
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
