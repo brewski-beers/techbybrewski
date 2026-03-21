@@ -127,3 +127,42 @@ export async function deleteClientDocument(
 ): Promise<void> {
   await deleteDoc(doc(db, "clients", clientUid, category, docId));
 }
+
+// ── Mercury (admin) ─────────────────────────────────────────────
+
+/**
+ * Request Mercury invoice creation for an existing Firestore invoice.
+ * Calls the server-side /api/mercury/invoice route (Mercury API key stays
+ * server-side). Updates mercuryInvoiceId + mercuryPaymentUrl on the doc
+ * and transitions status to "sent".
+ *
+ * BLOCKED: Requires LLC formation + Mercury banking account before going live.
+ * Returns the mercuryPaymentUrl on success.
+ */
+export async function linkMercuryInvoice(
+  clientUid: string,
+  invoiceId: string,
+  recipientEmail: string
+): Promise<string> {
+  const currentUser = auth.currentUser;
+  if (!currentUser) throw new Error("Not authenticated");
+
+  const idToken = await currentUser.getIdToken();
+
+  const res = await fetch("/api/mercury/invoice", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ clientUid, invoiceId, recipientEmail }),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: res.statusText })) as { error?: string };
+    throw new Error(body.error ?? `Mercury link failed: ${res.status}`);
+  }
+
+  const data = await res.json() as { mercuryPaymentUrl: string };
+  return data.mercuryPaymentUrl;
+}
