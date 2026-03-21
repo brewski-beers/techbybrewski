@@ -10,9 +10,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79, 70, 229, 0.10) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 30% at 80% 20%, rgba(249, 115, 22, 0.04) 0%, transparent 60%);
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79, 70, 229, 0.10) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -47,7 +45,7 @@
 
 .headline {
   letter-spacing: var(--tracking-tight);
-  background: linear-gradient(135deg, #334155 30%, var(--color-accent) 100%);
+  background: linear-gradient(135deg, var(--color-slate-700) 30%, var(--color-accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
