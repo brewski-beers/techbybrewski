@@ -6,6 +6,7 @@ import {
   deleteDoc,
   collection,
   serverTimestamp,
+  Timestamp,
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import type { ClientFormData } from "@/lib/types";
@@ -70,7 +71,7 @@ export async function createInvoice(
     mercuryInvoiceId: null,
     mercuryPaymentUrl: null,
     paidAt: null,
-    dueDate: data.dueDate ?? null,
+    dueDate: data.dueDate ? Timestamp.fromDate(data.dueDate) : null,
     createdAt: serverTimestamp(),
   });
   return ref.id;
