@@ -51,10 +51,8 @@ describe("POST /api/admin/set-claims", () => {
     expect(json.error).toBe("Unauthorized");
   });
 
-  it("returns 401 when authenticated but caller is not an admin", async () => {
+  it("returns 403 when authenticated but caller is not an admin", async () => {
     // Given: token is valid but decoded token has no admin claim
-    // Note: the route currently returns 401 (not 403) for the non-admin case —
-    // this test documents that existing behavior.
     mockVerifyIdToken.mockResolvedValueOnce({ uid: "user-2", admin: false });
 
     // When: request is made with a valid but non-admin token
@@ -64,8 +62,8 @@ describe("POST /api/admin/set-claims", () => {
     });
     const res = await POST(req);
 
-    // Then: response is 401 (documented behavior — route uses 401 for both unauthenticated and non-admin)
-    expect(res.status).toBe(401);
+    // Then: response is 403 Forbidden
+    expect(res.status).toBe(403);
   });
 
   it("returns 200 and sets claims when authenticated admin posts valid payload", async () => {
