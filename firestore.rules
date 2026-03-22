@@ -48,6 +48,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ---- Blog Posts ----
+    match /blogPosts/{id} {
+      allow read: if resource.data.isPublished == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
     // ---- Contact Submissions ----
     // Anyone can create (public contact form); only admins can read
     match /contactSubmissions/{id} {
