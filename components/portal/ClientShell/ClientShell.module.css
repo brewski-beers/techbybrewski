@@ -270,3 +270,22 @@
     padding: var(--space-10);
   }
 }
+
+.navItemLabel {
+  flex: 1;
+}
+
+.unreadBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: var(--font-semibold);
+  line-height: 1;
+}

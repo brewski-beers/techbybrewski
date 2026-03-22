@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { usePortalUser } from "@/components/portal/ClientAuthProvider/ClientAuthProvider";
+import { subscribeToUnreadMessageCount } from "@/lib/firestore/portalQueries";
 import styles from "./ClientShell.module.css";
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { label: "Dashboard", href: "/portal" },
   { label: "Documents", href: "/portal/documents" },
   { label: "Contracts", href: "/portal/contracts" },
@@ -22,18 +24,26 @@ export default function ClientShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { clientId } = usePortalUser();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const unsub = subscribeToUnreadMessageCount(clientId, setUnreadCount);
+    return unsub;
+  }, [clientId]);
 
   const closeDrawer = () => setDrawerOpen(false);
 
   const navContent = (
     <>
       <nav className={styles.nav}>
-        {NAV_ITEMS.map((item) => {
+        {BASE_NAV_ITEMS.map((item) => {
           const isActive =
             item.href === "/portal"
               ? pathname === "/portal"
               : pathname.startsWith(item.href);
+          const showBadge = item.href === "/portal/messages" && unreadCount > 0;
 
           return (
             <Link
@@ -42,7 +52,12 @@ export default function ClientShell({
               onClick={closeDrawer}
               className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
             >
-              {item.label}
+              <span className={styles.navItemLabel}>{item.label}</span>
+              {showBadge && (
+                <span className={styles.unreadBadge} aria-label={`${unreadCount} unread messages`}>
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -114,7 +129,7 @@ export default function ClientShell({
         {navContent}
       </aside>
 
-      {/* Main content */}
+      {/* Main content area */}
       <main className={styles.main}>
         <div className={styles.content}>{children}</div>
       </main>
