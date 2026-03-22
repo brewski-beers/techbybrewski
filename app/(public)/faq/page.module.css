@@ -1,0 +1,13 @@
+.header {
+  max-width: var(--container-md);
+  margin-bottom: var(--space-14);
+}
+
+.title {
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.subtitle {
+  max-width: 560px;
+}

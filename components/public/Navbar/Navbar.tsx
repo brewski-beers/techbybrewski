@@ -13,6 +13,7 @@ interface NavService {
 const STATIC_LINKS = [
   { label: "Work", href: "/case-studies" },
   { label: "Process", href: "/process" },
+  { label: "FAQ", href: "/faq" },
   { label: "About", href: "/about" },
   { label: "Client Portal", href: "/portal" },
 ];
