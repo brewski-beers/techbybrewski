@@ -51,10 +51,12 @@ export default function FAQAccordion({ faqs }: Props) {
                   </button>
                   <div
                     id={`faq-answer-${faq.id}`}
-                    className={styles.answer}
-                    hidden={!isOpen}
+                    className={`${styles.answerWrapper} ${isOpen ? styles.answerWrapperOpen : ""}`}
+                    aria-hidden={!isOpen}
                   >
-                    <p className={`text-body text-muted ${styles.answerText}`}>{faq.answer}</p>
+                    <div className={styles.answerInner}>
+                      <p className={`text-body text-muted ${styles.answerText}`}>{faq.answer}</p>
+                    </div>
                   </div>
                 </div>
               );
