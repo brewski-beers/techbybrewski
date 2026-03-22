@@ -105,6 +105,28 @@ const services = [
     isActive: true,
     isPublished: true,
   },
+  {
+    name: "AI Infrastructure",
+    slug: "ai-infrastructure",
+    summary:
+      "We build the custom AI routing, validation, and context resolution layer your product needs — implemented on your infrastructure, not a third-party subscription.",
+    bullets: [
+      "Provider-agnostic: works with any LLM or agent framework",
+      "Intelligent task routing with explainable agent dispatch",
+      "Output validation and automatic repair for reliable AI responses",
+      "Hierarchical context resolution for project- and environment-aware agents",
+      "Build + optional maintenance retainer — we own it with you long-term",
+    ],
+    useCases: [
+      "Multi-agent products that need reliable, cost-efficient task dispatch",
+      "AI features that break in production due to malformed or unreliable outputs",
+      "Teams that need their agents to be context-aware without hardcoding config",
+      "Founders who want a custom AI execution layer, not another SaaS dependency",
+    ],
+    order: 3,
+    isActive: true,
+    isPublished: true,
+  },
 ];
 
 const caseStudies = [
