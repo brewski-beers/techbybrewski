@@ -5,6 +5,7 @@ import {
   getSiteSettingsRest,
   getFeaturedCaseStudiesRest,
   getPublishedTestimonialsRest,
+  getPublishedServicesRest,
 } from "@/lib/firestore/rest";
 import ScrollReveal from "@/components/public/ScrollReveal";
 import styles from "./page.module.css";
@@ -21,10 +22,11 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [settings, caseStudies, testimonials] = await Promise.all([
+  const [settings, caseStudies, testimonials, services] = await Promise.all([
     getSiteSettingsRest(),
     getFeaturedCaseStudiesRest(3),
     getPublishedTestimonialsRest(),
+    getPublishedServicesRest(),
   ]);
 
   const ctaHref =
@@ -61,23 +63,27 @@ export default async function HomePage() {
       </section>
 
       {/* Systems We Build */}
-      <section className={`section ${styles.sectionDark}`}>
-        <div className="container">
-          <p className="text-overline">What We Build</p>
-          <h2 className={`text-h2 ${styles.sectionTitle}`}>Systems We Build</h2>
-          <p className={`text-body-lg ${styles.sectionIntro}`}>
-            If your business runs on spreadsheets, manual handoffs, or disconnected tools — these are the systems we replace them with.
-          </p>
-          <div className={styles.systemsGrid}>
-            {["Operational Dashboards", "Customer Portals", "Inventory & Resource Tracking", "Workflow Automation Tools", "Internal Management Systems", "Data Reporting Platforms"].map(s => (
-              <div key={s} className={styles.systemChip}>{s}</div>
-            ))}
+      {services.length > 0 && (
+        <section className={`section ${styles.sectionDark}`}>
+          <div className="container">
+            <p className="text-overline">What We Build</p>
+            <h2 className={`text-h2 ${styles.sectionTitle}`}>Systems We Build</h2>
+            <p className={`text-body-lg ${styles.sectionIntro}`}>
+              If your business runs on spreadsheets, manual handoffs, or disconnected tools — these are the systems we replace them with.
+            </p>
+            <div className={styles.systemsGrid}>
+              {services.map(s => (
+                <Link key={s.id} href={`/services/${s.slug}`} className={styles.systemChip}>
+                  {s.title}
+                </Link>
+              ))}
+            </div>
+            <div className={styles.systemsLink}>
+              <Link href="/services" className="btn-secondary">View our service offerings →</Link>
+            </div>
           </div>
-          <div className={styles.systemsLink}>
-            <Link href="/services" className="btn-secondary">View our service offerings →</Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Process Preview */}
       <section className={`section ${styles.section}`}>
