@@ -247,3 +247,9 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
   const snap = await getDocs(q);
   return snap.docs.map((d) => withId<BlogPost>(d.id, d.data()));
 }
+
+export async function getBlogPostById(id: string): Promise<BlogPost | null> {
+  const snap = await getDoc(doc(db, "blogPosts", id));
+  if (!snap.exists()) return null;
+  return withId<BlogPost>(snap.id, snap.data());
+}
