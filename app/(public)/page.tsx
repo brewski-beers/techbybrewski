@@ -23,10 +23,10 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const [settings, caseStudies, testimonials, services] = await Promise.all([
-    getSiteSettingsRest(),
-    getFeaturedCaseStudiesRest(3),
-    getPublishedTestimonialsRest(),
-    getPublishedServicesRest(),
+    getSiteSettingsRest().catch(() => null),
+    getFeaturedCaseStudiesRest(3).catch(() => []),
+    getPublishedTestimonialsRest().catch(() => []),
+    getPublishedServicesRest().catch(() => []),
   ]);
 
   const ctaHref =

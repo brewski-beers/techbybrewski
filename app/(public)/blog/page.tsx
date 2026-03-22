@@ -20,7 +20,7 @@ function formatDate(post: BlogPost): string {
 }
 
 export default async function BlogPage() {
-  const posts = await getPublishedBlogPostsRest();
+  const posts = await getPublishedBlogPostsRest().catch(() => []);
 
   return (
     <section className="section">
