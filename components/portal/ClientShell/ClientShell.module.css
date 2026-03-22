@@ -28,6 +28,7 @@
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
+  min-height: 56px;
 }
 
 @media (min-width: 1024px) {
@@ -41,7 +42,9 @@
   align-items: center;
   justify-content: center;
   color: var(--color-text);
-  padding: var(--space-1);
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-2);
   border-radius: var(--radius-sm);
   transition: background var(--transition-fast);
 }
@@ -128,7 +131,9 @@
   align-items: center;
   justify-content: center;
   color: var(--color-text-muted);
-  padding: var(--space-1);
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-2);
   border-radius: var(--radius-sm);
   transition: color var(--transition-fast), background var(--transition-fast);
 }
@@ -182,7 +187,9 @@
 }
 
 .navItem {
-  display: block;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
@@ -210,12 +217,15 @@
 .sidebarFooter {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
   padding: var(--space-4) var(--space-5);
   border-top: 1px solid var(--color-border);
 }
 
 .viewSiteLink {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--color-text-muted);
   transition: color var(--transition-fast);
 }
@@ -225,6 +235,9 @@
 }
 
 .signOutButton {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   text-align: left;
   color: var(--color-text-muted);
   transition: color var(--transition-fast);
@@ -238,6 +251,7 @@
 .main {
   flex: 1;
   overflow: auto;
+  min-width: 0;
 }
 
 .content {
