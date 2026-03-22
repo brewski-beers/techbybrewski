@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSiteSettings } from "@/lib/context/SiteSettingsContext";
@@ -22,9 +22,38 @@ export default function Navbar({ services = [] }: { services?: NavService[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const settings = useSiteSettings();
 
   const servicesActive = pathname.startsWith("/services");
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setDropdownOpen(false);
+  }, [pathname]);
+
+  // Close dropdown on click-outside
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
+
+  // Close dropdown on Escape
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setDropdownOpen(false);
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [dropdownOpen]);
 
   return (
     <header className={styles.header}>
@@ -36,18 +65,32 @@ export default function Navbar({ services = [] }: { services?: NavService[] }) {
         {/* Desktop links */}
         <div className={styles.desktopLinks}>
           {/* Services with dropdown */}
-          <div className={styles.dropdown}>
+          <div
+            ref={dropdownRef}
+            className={styles.dropdown}
+            onMouseEnter={() => services.length > 0 && setDropdownOpen(true)}
+            onMouseLeave={() => setDropdownOpen(false)}
+          >
             <Link
               href="/services"
               className={`${styles.link} ${servicesActive ? styles.linkActive : ""}`}
               aria-haspopup="true"
-              aria-expanded={services.length > 0 ? undefined : false}
+              aria-expanded={dropdownOpen}
+              onClick={() => setDropdownOpen(false)}
             >
               Services
             </Link>
             {services.length > 0 && (
-              <div className={styles.dropdownMenu} role="menu" aria-label="Services">
-                <Link href="/services" className={styles.dropdownAll}>
+              <div
+                className={`${styles.dropdownMenu} ${dropdownOpen ? styles.dropdownMenuOpen : ""}`}
+                role="menu"
+                aria-label="Services"
+              >
+                <Link
+                  href="/services"
+                  className={styles.dropdownAll}
+                  onClick={() => setDropdownOpen(false)}
+                >
                   All Services →
                 </Link>
                 <div className={styles.dropdownDivider} />
@@ -56,6 +99,7 @@ export default function Navbar({ services = [] }: { services?: NavService[] }) {
                     key={s.slug}
                     href={`/services/${s.slug}`}
                     className={`${styles.dropdownItem} ${pathname === `/services/${s.slug}` ? styles.dropdownItemActive : ""}`}
+                    onClick={() => setDropdownOpen(false)}
                   >
                     {s.name}
                   </Link>
