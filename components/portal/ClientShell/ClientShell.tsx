@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { label: "Contracts", href: "/portal/contracts" },
   { label: "Messages", href: "/portal/messages" },
   { label: "Invoices", href: "/portal/invoices" },
+  { label: "Settings", href: "/portal/settings" },
 ];
 
 export default function ClientShell({
