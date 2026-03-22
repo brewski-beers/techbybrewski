@@ -11,7 +11,7 @@
  */
 
 import { adminDb } from "@/lib/firebase-admin";
-import { Service, CaseStudy, CaseStudyImage, Testimonial, SiteSettings } from "@/lib/types";
+import { Service, CaseStudy, CaseStudyImage, Testimonial, SiteSettings, FAQ } from "@/lib/types";
 import type { DocumentData, QueryDocumentSnapshot } from "firebase-admin/firestore";
 
 // ── Timestamp stripping ────────────────────────────────────────
@@ -179,4 +179,24 @@ export async function getCaseStudyBySlugRest(slug: string): Promise<CaseStudy | 
   if (snap.empty) return null;
   const doc = snap.docs[0];
   return toCaseStudy(doc.id, doc.data());
+}
+
+function toFAQ(id: string, d: DocumentData): FAQ {
+  return {
+    id,
+    question: (d.question as string) ?? "",
+    answer: (d.answer as string) ?? "",
+    category: (d.category as string) ?? "",
+    order: (d.order as number) ?? 0,
+    isPublished: (d.isPublished as boolean) ?? false,
+  };
+}
+
+export async function getPublishedFAQsRest(): Promise<FAQ[]> {
+  const snap = await adminDb
+    .collection("faqs")
+    .where("isPublished", "==", true)
+    .orderBy("order", "asc")
+    .get();
+  return snap.docs.map((doc: QueryDocumentSnapshot) => toFAQ(doc.id, doc.data()));
 }
