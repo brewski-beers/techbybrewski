@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: "Services", href: "/admin/services" },
   { label: "Case Studies", href: "/admin/case-studies" },
   { label: "Testimonials", href: "/admin/testimonials" },
+  { label: "Blog", href: "/admin/blog" },
   { label: "FAQs", href: "/admin/faqs" },
   { label: "Activity Log", href: "/admin/activity-log" },
 ];
