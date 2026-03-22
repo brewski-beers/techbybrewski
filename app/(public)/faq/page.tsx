@@ -27,7 +27,7 @@ function buildFAQSchema(faqs: FAQ[]) {
 }
 
 export default async function FAQPage() {
-  const faqs = await getPublishedFAQsRest();
+  const faqs = await getPublishedFAQsRest().catch(() => []);
 
   return (
     <section className="section">

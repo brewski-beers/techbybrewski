@@ -4,8 +4,14 @@ import { getPublishedCaseStudySlugs, getCaseStudyBySlugRest } from "@/lib/firest
 import CaseStudyDetailClient from "./CaseStudyDetailClient";
 
 export async function generateStaticParams() {
-  const slugs = await getPublishedCaseStudySlugs();
-  return slugs.map((slug) => ({ slug }));
+  try {
+    const slugs = await getPublishedCaseStudySlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    // Firestore unavailable at build time (e.g. no ADC in Cloud Build).
+    // Return empty — Next.js will render pages dynamically at runtime.
+    return [];
+  }
 }
 
 export async function generateMetadata({

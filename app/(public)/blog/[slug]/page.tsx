@@ -16,8 +16,14 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const slugs = await getPublishedBlogPostSlugsRest();
-  return slugs.map((slug) => ({ slug }));
+  try {
+    const slugs = await getPublishedBlogPostSlugsRest();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    // Firestore unavailable at build time (e.g. no ADC in Cloud Build).
+    // Return empty — Next.js will render pages dynamically at runtime.
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

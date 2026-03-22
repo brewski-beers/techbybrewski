@@ -1,18 +1,23 @@
 import type { MetadataRoute } from "next";
 import { getPublishedServiceSlugs, getPublishedCaseStudySlugs } from "@/lib/firestore/rest";
+import { getPublishedBlogPostSlugsRest } from "@/lib/firestore/blog-rest";
 
 const BASE_URL = "https://techbybrewski.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [serviceSlugs, caseStudySlugs] = await Promise.all([
-    getPublishedServiceSlugs(),
-    getPublishedCaseStudySlugs(),
+  // Firestore may be unavailable at build time (no ADC in Cloud Build).
+  // Fall back to empty arrays — sitemap will contain static pages only.
+  const [serviceSlugs, caseStudySlugs, blogSlugs] = await Promise.all([
+    getPublishedServiceSlugs().catch(() => [] as string[]),
+    getPublishedCaseStudySlugs().catch(() => [] as string[]),
+    getPublishedBlogPostSlugsRest().catch(() => [] as string[]),
   ]);
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE_URL, changeFrequency: "weekly", priority: 1.0 },
     { url: `${BASE_URL}/services`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE_URL}/case-studies`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE_URL}/blog`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE_URL}/about`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/process`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/contact`, changeFrequency: "yearly", priority: 0.8 },
@@ -30,5 +35,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...servicePages, ...caseStudyPages];
+  const blogPages: MetadataRoute.Sitemap = blogSlugs.map((slug) => ({
+    url: `${BASE_URL}/blog/${slug}`,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...servicePages, ...caseStudyPages, ...blogPages];
 }
