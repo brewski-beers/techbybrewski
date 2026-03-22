@@ -1,0 +1,67 @@
+name: Blog Post Scheduler
+
+on:
+  schedule:
+    - cron: '0 15 * * 1'   # Monday 10am EST
+    - cron: '0 15 * * 4'   # Thursday 10am EST
+  workflow_dispatch:
+
+jobs:
+  generate-draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate blog draft
+        id: generate
+        run: |
+          RESPONSE=$(curl -sf -X POST "${{ secrets.BLOG_API_URL }}/api/blog/generate" \
+            -H "Authorization: Bearer ${{ secrets.BLOG_SCHEDULER_SECRET }}" \
+            -H "Content-Type: application/json")
+          echo "draft<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Open GitHub Issue with draft
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const draft = JSON.parse(process.env.DRAFT);
+            const sourcesBlock = draft.sources?.map(s => `- [${s.name}](${s.url})`).join('\n') ?? '_No sources returned_';
+            const body = [
+              '## Blog Draft — Review & Publish',
+              '',
+              `**Title:** ${draft.title}`,
+              `**Slug:** \`/blog/${draft.slug}\``,
+              `**Tags:** ${draft.tags?.join(', ') ?? ''}`,
+              '',
+              '**Excerpt:**',
+              `> ${draft.excerpt}`,
+              '',
+              '---',
+              '',
+              '## Full Post',
+              '',
+              draft.content,
+              '',
+              '---',
+              '',
+              '## Sources',
+              '',
+              sourcesBlock,
+              '',
+              '---',
+              '',
+              'To publish as-is, comment `/publish`.',
+              'To publish with edits, update this issue body first, then comment `/publish`.',
+              '',
+              `_Generated at ${draft.generatedAt}_`,
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Blog Draft: ${draft.title}`,
+              body,
+              labels: ['blog-draft'],
+            });
+        env:
+          DRAFT: ${{ steps.generate.outputs.draft }}
