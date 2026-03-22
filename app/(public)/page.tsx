@@ -74,7 +74,7 @@ export default async function HomePage() {
             <div className={styles.systemsGrid}>
               {services.map(s => (
                 <Link key={s.id} href={`/services/${s.slug}`} className={styles.systemChip}>
-                  {s.title}
+                  {s.name}
                 </Link>
               ))}
             </div>
