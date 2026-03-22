@@ -1,0 +1,64 @@
+name: Blog Post Publisher
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  publish:
+    if: |
+      github.event.comment.body == '/publish' &&
+      contains(github.event.issue.labels.*.name, 'blog-draft') &&
+      github.event.comment.user.login == 'brewski-beers'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse draft from issue body
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body;
+
+            const title = body.match(/\*\*Title:\*\* (.+)/)?.[1]?.trim();
+            const slug = body.match(/\*\*Slug:\*\* `\/blog\/([^`]+)`/)?.[1]?.trim();
+            const tagsRaw = body.match(/\*\*Tags:\*\* (.+)/)?.[1]?.trim();
+            const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+            const excerpt = body.match(/^> (.+)$/m)?.[1]?.trim();
+            const contentMatch = body.match(/## Full Post\n\n([\s\S]+?)\n\n---/);
+            const content = contentMatch?.[1]?.trim();
+
+            if (!title || !slug || !excerpt || !content) {
+              core.setFailed(`Could not parse draft. Got: title=${title}, slug=${slug}, excerpt=${excerpt}, content=${content ? '[present]' : '[missing]'}`);
+              return;
+            }
+
+            core.setOutput('payload', JSON.stringify({ title, slug, excerpt, content, tags }));
+
+      - name: Publish to Firestore
+        id: publish
+        run: |
+          RESPONSE=$(curl -sf -X POST "${{ secrets.BLOG_API_URL }}/api/blog/publish" \
+            -H "Authorization: Bearer ${{ secrets.BLOG_SCHEDULER_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '${{ steps.parse.outputs.payload }}')
+          echo "result=$RESPONSE" >> $GITHUB_OUTPUT
+
+      - name: Comment success and close issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = JSON.parse(process.env.RESULT);
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: `✅ Published! ${result.url}`,
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+            });
+        env:
+          RESULT: ${{ steps.publish.outputs.result }}
