@@ -97,11 +97,23 @@
   position: relative;
 }
 
+/* Invisible bridge fills the gap between the trigger and the panel
+   so the cursor doesn't leave the parent element while travelling down */
+.dropdown::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--space-3);
+  /* transparent — only exists to keep pointer-events within .dropdown */
+}
+
 .dropdownMenu {
   position: absolute;
   top: calc(100% + var(--space-3));
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-4px);
   min-width: 220px;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -112,13 +124,11 @@
   flex-direction: column;
   opacity: 0;
   pointer-events: none;
-  transform: translateX(-50%) translateY(-4px);
   transition: opacity var(--transition-fast), transform var(--transition-fast);
   z-index: var(--z-dropdown);
 }
 
-.dropdown:hover .dropdownMenu,
-.dropdown:focus-within .dropdownMenu {
+.dropdownMenuOpen {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
