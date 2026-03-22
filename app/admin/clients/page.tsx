@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getAllClients } from "@/lib/firestore/portalQueries";
+import { getAllClients, subscribeToAdminUnreadCounts } from "@/lib/firestore/portalQueries";
 import { Client } from "@/lib/types";
 import { Button, Badge, Card } from "@/components/ui";
 import styles from "@/styles/adminList.module.css";
@@ -15,9 +15,15 @@ const STATUS_VARIANT: Record<Client["status"], "published" | "draft" | "neutral"
 export default function AdminClientsPage() {
   const [items, setItems] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     getAllClients().then(setItems).finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    const unsub = subscribeToAdminUnreadCounts(setUnreadCounts);
+    return unsub;
   }, []);
 
   return (
@@ -56,7 +62,12 @@ export default function AdminClientsPage() {
               className={styles.item}
             >
               <div className={styles.itemMain}>
-                <span className="text-body font-semibold">{c.companyName}</span>
+                <span className="text-body font-semibold">
+                  {c.companyName}
+                  {(unreadCounts[c.id] ?? 0) > 0 && (
+                    <span className={styles.unreadDot} aria-label={`${unreadCounts[c.id]} unread messages`} />
+                  )}
+                </span>
                 <span className="text-body-sm text-muted">
                   {c.contactName} · {c.email}
                 </span>

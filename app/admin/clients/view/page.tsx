@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   getClient,
   getClientDocuments,
+  subscribeToClientUnreadForAdmin,
   getClientContracts,
   getClientInvoices,
 } from "@/lib/firestore/portalQueries";
@@ -52,6 +53,7 @@ export default function AdminClientViewPage() {
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("documents");
+  const [messagesUnread, setMessagesUnread] = useState(0);
 
   useEffect(() => {
     if (!clientId) return;
@@ -59,6 +61,12 @@ export default function AdminClientViewPage() {
       .then(setClient)
       .catch(console.error)
       .finally(() => setLoading(false));
+  }, [clientId]);
+
+  useEffect(() => {
+    if (!clientId) return;
+    const unsub = subscribeToClientUnreadForAdmin(clientId, setMessagesUnread);
+    return unsub;
   }, [clientId]);
 
   if (!clientId) {
@@ -105,6 +113,11 @@ export default function AdminClientViewPage() {
             onClick={() => setActiveTab(t.key)}
           >
             {t.label}
+            {t.key === "messages" && messagesUnread > 0 && (
+              <span className={styles.tabUnreadBadge} aria-label={`${messagesUnread} unread`}>
+                {messagesUnread > 99 ? "99+" : messagesUnread}
+              </span>
+            )}
           </button>
         ))}
       </div>
