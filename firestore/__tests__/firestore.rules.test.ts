@@ -251,3 +251,131 @@ describe("Admin access", () => {
     );
   });
 });
+
+// ---------------------------------------------------------------------------
+// Public collections — isPublished gating
+// ---------------------------------------------------------------------------
+
+describe("Public collections — isPublished gating", () => {
+  const PUBLIC_COLLECTIONS = ["services", "caseStudies", "testimonials", "faqs"];
+
+  for (const col of PUBLIC_COLLECTIONS) {
+    it(`denies unauthenticated read of unpublished ${col} document`, async () => {
+      // Given: an unpublished document exists
+      await seed(`${col}/doc-1`, { isPublished: false, name: "Hidden" });
+
+      // When: unauthenticated user reads it
+      // Then: read is denied
+      await assertFails(getDoc(doc(unauthed(), `${col}/doc-1`)));
+    });
+
+    it(`allows admin to read unpublished ${col} document`, async () => {
+      // Given: an unpublished document exists
+      await seed(`${col}/doc-1`, { isPublished: false, name: "Hidden" });
+
+      // When: admin reads it
+      // Then: read is allowed (admin bypasses isPublished check)
+      await assertSucceeds(getDoc(doc(asAdmin("admin-1"), `${col}/doc-1`)));
+    });
+
+    it(`allows admin to write to ${col}`, async () => {
+      // Given: admin context
+      // When: admin creates a document
+      // Then: write is allowed
+      await assertSucceeds(
+        setDoc(doc(asAdmin("admin-1"), `${col}/new-doc`), {
+          isPublished: false,
+          name: "Draft",
+        })
+      );
+    });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// contactSubmissions — public read denied
+// ---------------------------------------------------------------------------
+
+describe("contactSubmissions — access control", () => {
+  it("denies unauthenticated read of contactSubmissions", async () => {
+    // Given: a contact submission exists
+    await seed("contactSubmissions/sub-1", {
+      name: "Visitor",
+      email: "v@example.com",
+    });
+
+    // When: unauthenticated user reads it
+    // Then: read is denied
+    await assertFails(
+      getDoc(doc(unauthed(), "contactSubmissions/sub-1"))
+    );
+  });
+
+  it("allows admin to read contactSubmissions", async () => {
+    // Given: a contact submission exists
+    await seed("contactSubmissions/sub-1", {
+      name: "Visitor",
+      email: "v@example.com",
+    });
+
+    // When: admin reads it
+    // Then: read is allowed
+    await assertSucceeds(
+      getDoc(doc(asAdmin("admin-1"), "contactSubmissions/sub-1"))
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Client portal — messages and invoice write restrictions
+// ---------------------------------------------------------------------------
+
+describe("Client portal — subcollection access", () => {
+  it("allows a client to create a message in their own subcollection", async () => {
+    // Given: client1 is authenticated
+    // When: they create a message in clients/client1/messages
+    // Then: write succeeds
+    await assertSucceeds(
+      addDoc(
+        collection(asClient("client1"), "clients/client1/messages"),
+        { body: "Hello admin", senderRole: "client" }
+      )
+    );
+  });
+
+  it("denies a client writing to their own invoices subcollection", async () => {
+    // Given: client1 is authenticated
+    // When: they attempt to write an invoice in clients/client1/invoices
+    // Then: write is denied (clients can only read invoices, not write)
+    await assertFails(
+      setDoc(doc(asClient("client1"), "clients/client1/invoices/inv-fake"), {
+        amountCents: 0,
+        status: "draft",
+      })
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Default deny — unmatched paths
+// ---------------------------------------------------------------------------
+
+describe("Default deny", () => {
+  it("denies unauthenticated read of an undefined collection", async () => {
+    // Given: any user
+    // When: they access a path that matches no rule
+    // Then: access is denied
+    await assertFails(
+      getDoc(doc(unauthed(), "unknownCollection/some-doc"))
+    );
+  });
+
+  it("denies admin read of an undefined collection", async () => {
+    // Given: admin user
+    // When: they access an undefined collection path
+    // Then: access is still denied (admin has no blanket grant — only specific collections)
+    await assertFails(
+      getDoc(doc(asAdmin("admin-1"), "unknownCollection/some-doc"))
+    );
+  });
+});
