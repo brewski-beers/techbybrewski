@@ -95,6 +95,8 @@
 /* Services dropdown */
 .dropdown {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 /* Invisible bridge fills the gap between the trigger and the panel
