@@ -1,0 +1,123 @@
+.header {
+  max-width: var(--container-md);
+  margin-bottom: var(--space-14);
+}
+
+.title {
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.subtitle {
+  max-width: 560px;
+}
+
+.empty {
+  text-align: center;
+  padding: var(--space-20) 0;
+}
+
+/* Grid */
+.grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Card */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.cardLink {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cardImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+
+.cardImg {
+  object-fit: cover;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  flex: 1;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tag {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--color-text-accent);
+  background: var(--color-accent-muted);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 4px;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.cardTitle {
+  margin: 0;
+}
+
+.excerpt {
+  flex: 1;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.metaDot {
+  color: var(--color-text-subtle);
+}
