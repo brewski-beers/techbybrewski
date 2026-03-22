@@ -5,8 +5,15 @@
 ## Stack
 
 - Next.js 15, React 19, TypeScript
-- Firebase (Firestore, Auth, App Hosting)
+- Firebase (Firestore, Auth, App Hosting → migrating to Vercel)
 - Tailwind CSS
+
+## Hosting
+
+- **Production:** Vercel (push to `main` triggers automatic deploy)
+- **Vercel project:** brewski-beers/techbybrewski (linked via GitHub integration)
+- **Production branch:** `main` — only pushes to `main` trigger deploys (preview deploys disabled)
+- **NEVER add `output: export`** — Firebase Admin SDK breaks on static export
 
 ## Project Structure
 
