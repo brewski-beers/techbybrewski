@@ -17,6 +17,7 @@ import type {
   TestimonialFormData,
   FAQFormData,
   ActivityAction,
+  BlogPostFormData,
 } from "@/lib/types";
 
 // ── Activity Log ──────────────────────────────────────────────
@@ -178,4 +179,48 @@ export async function reorderTestimonials(items: { id: string; order: number }[]
 
 export async function reorderCaseStudies(items: { id: string; order: number }[]): Promise<void> {
   await reorderCollection("caseStudies", items);
+}
+
+// ── Blog Posts ─────────────────────────────────────────────────
+
+export async function createBlogPost(data: BlogPostFormData): Promise<string> {
+  const ref = await addDoc(collection(db, "blogPosts"), {
+    ...data,
+    isPublished: false,
+    publishedAt: null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  await log("CREATE", "blogPosts", ref.id, `Created blog post: ${data.title}`);
+  return ref.id;
+}
+
+export async function updateBlogPost(id: string, data: Partial<BlogPostFormData>): Promise<void> {
+  await updateDoc(doc(db, "blogPosts", id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+  await log("UPDATE", "blogPosts", id, `Updated blog post: ${data.title ?? id}`);
+}
+
+export async function deleteBlogPost(id: string, title: string): Promise<void> {
+  await deleteDoc(doc(db, "blogPosts", id));
+  await log("DELETE", "blogPosts", id, `Deleted blog post: ${title}`);
+}
+
+export async function publishBlogPost(id: string, title: string, wasPublished: boolean): Promise<void> {
+  await updateDoc(doc(db, "blogPosts", id), {
+    isPublished: true,
+    updatedAt: serverTimestamp(),
+    ...(wasPublished ? {} : { publishedAt: serverTimestamp() }),
+  });
+  await log("PUBLISH", "blogPosts", id, `Published blog post: ${title}`);
+}
+
+export async function unpublishBlogPost(id: string, title: string): Promise<void> {
+  await updateDoc(doc(db, "blogPosts", id), {
+    isPublished: false,
+    updatedAt: serverTimestamp(),
+  });
+  await log("UNPUBLISH", "blogPosts", id, `Unpublished blog post: ${title}`);
 }

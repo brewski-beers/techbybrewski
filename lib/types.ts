@@ -171,3 +171,21 @@ export interface ClientInvoice {
   dueDate: FirestoreTimestamp | null;
   createdAt: FirestoreTimestamp;
 }
+
+// ── Blog Post ──────────────────────────────────────────────────
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;        // Short summary for listing cards
+  content: string;        // Markdown body
+  coverImageUrl?: string;
+  tags: string[];
+  author: string;
+  isPublished: boolean;
+  publishedAt: FirestoreTimestamp | null;
+  createdAt: FirestoreTimestamp;
+  updatedAt: FirestoreTimestamp;
+}
+
+export type BlogPostFormData = Omit<BlogPost, "id" | "publishedAt" | "createdAt" | "updatedAt">;

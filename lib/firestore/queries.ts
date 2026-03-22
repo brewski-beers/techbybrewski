@@ -18,6 +18,7 @@ import type {
   Testimonial,
   FAQ,
   ActivityLogEntry,
+  BlogPost,
 } from "@/lib/types";
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -214,4 +215,35 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     testimonials: count(testimonials),
     faqs: count(faqs),
   };
+}
+
+// ── Blog Posts ─────────────────────────────────────────────────
+
+export async function getPublishedBlogPosts(): Promise<BlogPost[]> {
+  const q = query(
+    collection(db, "blogPosts"),
+    where("isPublished", "==", true),
+    orderBy("publishedAt", "desc")
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => withId<BlogPost>(d.id, d.data()));
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const q = query(
+    collection(db, "blogPosts"),
+    where("slug", "==", slug),
+    where("isPublished", "==", true),
+    limit(1)
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return withId<BlogPost>(d.id, d.data());
+}
+
+export async function getAllBlogPosts(): Promise<BlogPost[]> {
+  const q = query(collection(db, "blogPosts"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => withId<BlogPost>(d.id, d.data()));
 }
