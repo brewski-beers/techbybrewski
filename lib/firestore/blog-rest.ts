@@ -22,7 +22,7 @@ function toBlogPost(id: string, d: DocumentData): BlogPost {
     tags: (d.tags as string[]) ?? [],
     author: (d.author as string) ?? "",
     isPublished: (d.isPublished as boolean) ?? false,
-    publishedAt: null,
+    publishedAt: d.publishedAt ?? null,
     createdAt: d.createdAt ?? null,
     updatedAt: d.updatedAt ?? null,
   };
