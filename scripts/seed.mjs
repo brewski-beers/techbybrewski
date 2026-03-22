@@ -294,7 +294,7 @@ BrewCortex has four logical layers.
 
 At a high level, the system looks like this:
 
-```
+\`\`\`
 Task Input
     |
     v
@@ -317,7 +317,7 @@ Task Input
     v
 [ PR / Output ]
   Commit, branch, pull request — fully autonomous
-```
+\`\`\`
 
 Each layer is independent and replaceable. The routing layer doesn't know about memory. The context layer doesn't know about routing. They compose cleanly because they're designed as separate concerns.
 
@@ -364,7 +364,7 @@ Three patterns made the difference between a proof-of-concept and something that
 
 **Explicit memory writes.** The temptation is to auto-capture everything. Don't. Have agents append only non-obvious findings: routing corrections, project gotchas, process improvements. When memory is curated, agents actually read it. When it's everything, nobody reads it.
 
-**Conventional commit discipline.** Every agent output that touches code follows conventional commits: `feat|fix|refactor|chore|docs|test|perf|ci`. This is enforced by context, not by hooks. The result is a commit history that's readable and reviewable — which matters when autonomous agents are producing dozens of commits per week.
+**Conventional commit discipline.** Every agent output that touches code follows conventional commits: \`feat|fix|refactor|chore|docs|test|perf|ci\`. This is enforced by context, not by hooks. The result is a commit history that's readable and reviewable — which matters when autonomous agents are producing dozens of commits per week.
 
 **Sequential single-ticket work.** Parallel agent execution sounds powerful. In practice, when multiple agents write to the same working tree, you get branch collisions, stale index problems, and hard-to-debug state corruption. The current model is sequential: one ticket, one agent, one branch, one PR. Simple. Reliable.
 

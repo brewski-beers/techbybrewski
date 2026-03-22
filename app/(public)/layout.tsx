@@ -5,8 +5,15 @@ import { getPublishedServicesRest } from "@/lib/firestore/rest";
 import styles from "./layout.module.css";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  const services = await getPublishedServicesRest();
-  const navServices = services.map(s => ({ name: s.name, slug: s.slug }));
+  // Firestore may be unavailable at build time (no ADC in Cloud Build).
+  // Fall back to empty nav services — they will load correctly at runtime.
+  let navServices: { name: string; slug: string }[] = [];
+  try {
+    const services = await getPublishedServicesRest();
+    navServices = services.map(s => ({ name: s.name, slug: s.slug }));
+  } catch {
+    // intentionally silent — runtime will have ADC and serve correct data
+  }
 
   return (
     <SiteSettingsProvider>
