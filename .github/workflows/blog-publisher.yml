@@ -36,12 +36,20 @@ jobs:
 
       - name: Publish to Firestore
         id: publish
+        env:
+          BLOG_API_URL: ${{ secrets.BLOG_API_URL }}
+          BLOG_SCHEDULER_SECRET: ${{ secrets.BLOG_SCHEDULER_SECRET }}
+          PAYLOAD: ${{ steps.parse.outputs.payload }}
         run: |
-          RESPONSE=$(curl -sf -X POST "${{ secrets.BLOG_API_URL }}/api/blog/publish" \
-            -H "Authorization: Bearer ${{ secrets.BLOG_SCHEDULER_SECRET }}" \
+          RESPONSE=$(curl -sf -X POST "$BLOG_API_URL/api/blog/publish" \
+            -H "Authorization: Bearer $BLOG_SCHEDULER_SECRET" \
             -H "Content-Type: application/json" \
-            -d '${{ steps.parse.outputs.payload }}')
-          echo "result=$RESPONSE" >> $GITHUB_OUTPUT
+            --data-raw "$PAYLOAD")
+          {
+            echo "result<<EOF"
+            echo "$RESPONSE"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
       - name: Comment success and close issue
         uses: actions/github-script@v7
