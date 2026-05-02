@@ -60,6 +60,14 @@ async function callClaude(prompt: string, maxTokens: number): Promise<string> {
   return block.text;
 }
 
+function stripJsonFences(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+}
+
 export async function POST(req: NextRequest) {
   if (!verifySecret(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -79,7 +87,7 @@ Return ONLY valid JSON (no markdown, no prose):
 { "topic": string, "why_interesting": string, "sources": [{ "name": string, "url": string }], "suggested_angle": string }`,
       1024
     );
-    research = JSON.parse(researchText) as ResearchResult;
+    research = JSON.parse(stripJsonFences(researchText)) as ResearchResult;
   } catch (err) {
     console.error("blog/generate: research step failed", err);
     const message = err instanceof Error ? err.message : "Research step failed";
@@ -111,7 +119,7 @@ Return ONLY valid JSON (no markdown, no code fences):
 { "title": string, "slug": string, "excerpt": string, "content": string, "tags": string[] }`,
       2048
     );
-    draft = JSON.parse(draftText) as DraftResult;
+    draft = JSON.parse(stripJsonFences(draftText)) as DraftResult;
   } catch (err) {
     console.error("blog/generate: draft step failed", err);
     const message = err instanceof Error ? err.message : "Draft step failed";
