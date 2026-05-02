@@ -15,6 +15,15 @@
 - **Production URL:** https://techbybrewski.vercel.app/
 - **NEVER add `output: export`** — Firebase Admin SDK breaks on static export
 
+## Shared Secrets (GitHub Actions ↔ Vercel)
+
+`BLOG_SCHEDULER_SECRET` is consumed by both GitHub Actions (blog-scheduler.yml, blog-publisher.yml) and the Vercel runtime (`/api/blog/*`). To prevent drift:
+
+- **Single source of truth:** `.github/workflows/sync-blog-secret.yml` (workflow_dispatch). Writes the value to both GitHub Actions and all 3 Vercel envs, then redeploys.
+- **NEVER edit `BLOG_SCHEDULER_SECRET` directly in GitHub or Vercel UI** — always run the sync workflow. Manual edits caused a 6-week scheduler outage (Mar 23 → May 2 2026).
+- **Required GitHub secrets to run sync:** `GH_PAT_SECRETS_WRITE` (PAT with `repo > secrets:write`), `VERCEL_TOKEN`, `VERCEL_TEAM_ID`, `VERCEL_PROJECT_ID`.
+- **Same pattern for any future shared secret:** add a `sync-<name>.yml` workflow before introducing a second consumer.
+
 ## Project Structure
 
 ```
