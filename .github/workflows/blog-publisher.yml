@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Parse draft from issue body
         id: parse
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const body = context.payload.issue.body;
@@ -56,7 +56,7 @@ jobs:
           } >> $GITHUB_OUTPUT
 
       - name: Comment success and close issue
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const result = JSON.parse(process.env.RESULT);
