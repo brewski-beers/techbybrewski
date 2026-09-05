@@ -1,0 +1,72 @@
+name: Claude Implement
+
+# Issue-driven implementer. Add the `agent` label to an issue and Claude opens a
+# DRAFT PR that closes it. Auth is keyless via workload identity federation
+# (BrewCortex docs/autonomous-workforce.md) — no ANTHROPIC_API_KEY secret.
+# `github_token` is NOT passed so the action authenticates as the Claude GitHub
+# App, whose pushes trigger ci.yml.
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Issue number to implement
+        required: true
+
+concurrency:
+  group: claude-implement-${{ github.event.issue.number || github.event.inputs.issue }}
+  cancel-in-progress: false
+
+jobs:
+  implement:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.label.name == 'agent'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
+          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
+          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
+          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          # Plain-text prompts get NO tools by default in automation mode.
+          claude_args: >-
+            --max-turns 40
+            --model claude-sonnet-5
+            --allowedTools "Bash,Edit,MultiEdit,Write,Read,Glob,Grep,TodoWrite"
+          prompt: |
+            Implement GitHub issue #${{ github.event.issue.number || github.event.inputs.issue }}
+            in this repository (brewski-beers/techbybrewski).
+
+            Workflow:
+            1. Read the issue with `gh issue view <n>`. If its body has a
+               `## ⚠️ Manual Prerequisites` section with any unchecked `- [ ]`,
+               stop and comment that manual prerequisites block it. Do not implement.
+            2. Read the repo's CLAUDE.md and follow its conventions.
+            3. Create a branch `worker/<n>-<short-kebab-slug>` off origin/main.
+            4. Make the change. Keep it minimal and focused on the issue.
+            5. Run `npm ci`, then `npm run lint` and `npx tsc --noEmit`. Fix
+               anything you broke. Do not commit with lint or type errors.
+            6. Commit (`feat: <issue title> (closes #<n>)` or the right
+               conventional-commit type), push the branch.
+            7. Open a **draft** PR with `gh pr create --draft`, base `main`,
+               body starting with `Closes #<n>` and a short `## What` /
+               `## Notes` summary.
+            8. Comment on the issue with the PR link.
+
+            If you cannot complete it, comment on the issue explaining why and
+            leave it open. Never push directly to main.

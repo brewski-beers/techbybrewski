@@ -1,0 +1,100 @@
+name: Claude Review
+
+# Reviews worker PRs and, for opt-in low-risk ones, enables auto-merge.
+#
+# Merge gate (all must hold):
+#   - PR head branch is `worker/*`
+#   - the linked issue carries the `auto-merge` label
+#   - the review job completed
+#   - the `Required` status check goes green  <- enforced by branch ruleset
+#     via `gh pr merge --auto`, not by this workflow waiting
+#
+# Anything without the `auto-merge` label: review comments are posted and the
+# PR is left for KB. BLOCKING findings are NOT programmatically enforced here
+# (pure-YAML can't read the review verdict) — the stronger gate is the
+# routine-driven `/auto-review` skill. Treat this as the fast reflex.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: startsWith(github.head_ref, 'worker/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
+          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
+          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
+          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          allowed_bots: "claude[bot],github-actions[bot]"
+          plugin_marketplaces: "https://github.com/anthropics/claude-code.git"
+          plugins: "code-review@claude-code-plugins"
+          prompt: "/code-review:code-review --comment ${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+          claude_args: >-
+            --model claude-sonnet-5
+            --allowedTools "mcp__github_inline_comment__create_inline_comment"
+
+  auto-merge:
+    needs: review
+    if: startsWith(github.head_ref, 'worker/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: read
+    steps:
+      - name: Check auto-merge opt-in and enable
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+
+          # This job has no checkout — GH_REPO tells gh which repo to act on
+          # instead of inferring from a (nonexistent) local git dir.
+
+          # Only main-based PRs auto-merge. Stacked PRs (base = another
+          # worker/* branch) are left for bottom-up manual/routine merge.
+          if [ "$BASE" != "main" ]; then
+            echo "PR #$PR base is '$BASE', not main — skipping auto-merge (stacked)."
+            exit 0
+          fi
+
+          # Resolve the linked issue from the `Closes #N` line in the PR body.
+          BODY=$(gh pr view "$PR" --json body --jq .body)
+          ISSUE=$(printf '%s\n' "$BODY" | grep -oiE 'closes #[0-9]+' | head -1 | grep -oE '[0-9]+' || true)
+          if [ -z "${ISSUE:-}" ]; then
+            echo "No linked issue found in PR body — skipping auto-merge."
+            exit 0
+          fi
+
+          HAS_LABEL=$(gh issue view "$ISSUE" --json labels \
+            --jq '[.labels[].name] | index("auto-merge") != null')
+          if [ "$HAS_LABEL" != "true" ]; then
+            echo "Issue #$ISSUE not labeled auto-merge — leaving PR #$PR for KB."
+            exit 0
+          fi
+
+          echo "Issue #$ISSUE is opt-in. Marking PR #$PR ready and enabling auto-merge."
+          gh pr ready "$PR"
+          gh pr merge "$PR" --auto --squash
