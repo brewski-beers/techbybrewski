@@ -4,7 +4,10 @@ on:
   pull_request:
     branches:
       - main
-    types: [opened, synchronize]
+    # `ready_for_review` is required: worker PRs open as drafts (CI skipped
+    # below) and flipping to "Ready for review" fires no other event, so
+    # without it the suite never runs before merge.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -12,6 +15,10 @@ concurrency:
 
 jobs:
   changes:
+    # Skip the whole suite while a PR is a draft — draft PRs can't merge, and
+    # `verify` depends on this job, so skipping here cascades to skip verify.
+    # Worker PRs stay draft until reviewed; CI runs once on the ready flip.
+    if: github.event.pull_request.draft != true
     runs-on: ubuntu-latest
     outputs:
       code: ${{ steps.filter.outputs.code }}
