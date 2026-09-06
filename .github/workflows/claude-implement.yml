@@ -20,10 +20,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  implement:
+  # Skip when the issue already has a PR — avoids a duplicate implement run when
+  # KB (or /work-parallel) is working the same issue by hand. Mirrors the
+  # "already has an open linked PR" filter in /work-parallel Step 1.
+  dedup:
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event.label.name == 'agent'
+    runs-on: ubuntu-latest
+    outputs:
+      proceed: ${{ steps.check.outputs.proceed }}
+    steps:
+      - name: Check for an existing PR linked to this issue
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
+        run: |
+          set -euo pipefail
+          branch_hit=$(gh pr list --state open --json headRefName \
+            --jq "[.[] | select(.headRefName | test(\"^worker/${ISSUE}-\"))] | length")
+          body_hit=$(gh pr list --state all --limit 50 --json state,body \
+            --jq "[.[] | select(.state == \"OPEN\" or .state == \"MERGED\")
+                       | select(.body | test(\"(?i)(clos|fix|resolv)e[sd]? #${ISSUE}\\\\b\"))] | length")
+          if [ "${branch_hit:-0}" -gt 0 ] || [ "${body_hit:-0}" -gt 0 ]; then
+            echo "Issue #${ISSUE} already has a linked PR (branch:${branch_hit} body:${body_hit}) — skipping implement."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  implement:
+    needs: dedup
+    if: needs.dedup.outputs.proceed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
