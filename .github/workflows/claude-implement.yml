@@ -23,6 +23,10 @@ jobs:
   # Skip when the issue already has a PR — avoids a duplicate implement run when
   # KB (or /work-parallel) is working the same issue by hand. Mirrors the
   # "already has an open linked PR" filter in /work-parallel Step 1.
+  #
+  # Also skip while any `Depends on: #N` reference in the issue body is still
+  # open — stops a freshly-labelled non-root issue from building against a stale
+  # main. workflow_dispatch overrides both guards.
   dedup:
     if: >
       github.event_name == 'workflow_dispatch' ||
@@ -31,14 +35,17 @@ jobs:
     outputs:
       proceed: ${{ steps.check.outputs.proceed }}
     steps:
-      - name: Check for an existing PR linked to this issue
+      - name: Check for an existing PR or unmet dependency
         id: check
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
           ISSUE: ${{ github.event.issue.number || github.event.inputs.issue }}
         run: |
           set -euo pipefail
+          summary="${GITHUB_STEP_SUMMARY:-/dev/null}"
+
           branch_hit=$(gh pr list --state open --json headRefName \
             --jq "[.[] | select(.headRefName | test(\"^worker/${ISSUE}-\"))] | length")
           body_hit=$(gh pr list --state all --limit 50 --json state,body \
@@ -46,6 +53,41 @@ jobs:
                        | select(.body | test(\"(?i)(clos|fix|resolv)e[sd]? #${ISSUE}\\\\b\"))] | length")
           if [ "${branch_hit:-0}" -gt 0 ] || [ "${body_hit:-0}" -gt 0 ]; then
             echo "Issue #${ISSUE} already has a linked PR (branch:${branch_hit} body:${body_hit}) — skipping implement."
+            echo "#${ISSUE} already has a linked PR — skipping implement." >> "$summary"
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Manual runs proceed regardless — mirrors the dispatch carve-out in the
+          # job-level `if` above.
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            echo "workflow_dispatch — dependency guard bypassed."
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          body=$(gh issue view "${ISSUE}" --json body --jq '.body // ""')
+          # Every `#N` on a line beginning with `Depends on:` (case-insensitive),
+          # optionally wrapped in markdown bold (`**Depends on:**`, the format
+          # /plan and /po actually write into issue bodies in this repo).
+          # Handles a single ref and comma lists (`Depends on: #12, #13`).
+          # A malformed line (no `#N`) simply yields no deps.
+          deps=$(printf '%s\n' "$body" \
+            | grep -ioE '^[[:space:]]*\*{0,2}Depends on:\*{0,2}[[:space:]]*#[0-9][0-9, #]*' \
+            | grep -oE '#[0-9]+' | tr -d '#' | sort -u || true)
+
+          blocker=""
+          for dep in $deps; do
+            state=$(gh issue view "$dep" --json state --jq '.state' 2>/dev/null || echo "")
+            if [ "$state" = "OPEN" ]; then
+              blocker="$dep"
+              break
+            fi
+          done
+
+          if [ -n "$blocker" ]; then
+            echo "#${ISSUE} blocked on open dependency #${blocker}"
+            echo "#${ISSUE} blocked on open dependency #${blocker}" >> "$summary"
             echo "proceed=false" >> "$GITHUB_OUTPUT"
           else
             echo "proceed=true" >> "$GITHUB_OUTPUT"
