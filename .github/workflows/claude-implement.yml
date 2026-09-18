@@ -67,11 +67,13 @@ jobs:
           fi
 
           body=$(gh issue view "${ISSUE}" --json body --jq '.body // ""')
-          # Every `#N` on a line beginning with `Depends on:` (case-insensitive).
+          # Every `#N` on a line beginning with `Depends on:` (case-insensitive),
+          # optionally wrapped in markdown bold (`**Depends on:**`, the format
+          # /plan and /po actually write into issue bodies in this repo).
           # Handles a single ref and comma lists (`Depends on: #12, #13`).
           # A malformed line (no `#N`) simply yields no deps.
           deps=$(printf '%s\n' "$body" \
-            | grep -ioE '^[[:space:]]*Depends on:[[:space:]]*#[0-9][0-9, #]*' \
+            | grep -ioE '^[[:space:]]*\*{0,2}Depends on:\*{0,2}[[:space:]]*#[0-9][0-9, #]*' \
             | grep -oE '#[0-9]+' | tr -d '#' | sort -u || true)
 
           blocker=""
